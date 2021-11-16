@@ -1,0 +1,112 @@
+
+The $G^o_b$-invariance (Left invariance?) of $\mathcal{L}$ implies that the Lagrangian $\mathcal{L} = \mathcal{L}(q_m, \dot{q}_m,^bV^o_b)$ does not explicitly depend on the base configuration $g^o_b$, i.e., the base shape space variables are cyclic (why? not necessarily? does that not relate to ...'s work from 90s?). %Noting that the Lagrange-Poincare equations are local equations (meaning?), since the coordinates correspond to a (local) trivialization of the reduced shape space bundle(?).
+Since these equations are independent of $g^o_b$, they locally drop to the quotient(see Appendix \ref{Appendix:geometric}).
+Let $Q$ denote the $n+6$-dimensional configuration manifold of the space manipulator. An element $q \in Q$ consists of a set of velocities of the base spacecraft and joint parameters of the manipulator.
+It is possible to write
+down a useful explicit form of the reduced Lagrangian for mechanical systems
+(see, e.g., Murray [1995] and Ostrowski [1995, 1998]). We shall also
+see a related, even simpler version of this in the next section in the context
+of Routh reduction.
+Suppose we have a Lagrangian on L on TQ that is invariant under the
+action of G on Q. We define the reduced Lagrangian l : TQ/G → R to be
+l(r, ξ, r˙) = L(r, g
+−1g, ˙ r, g
+−1 ˙ g) , (3.11.5)
+where (ξ = g−1g˙, r, r˙) are local coordinates on TQ/G. Here the ξ are referred
+to as body velocities or velocities with respect to the body frame,
+while ξs = ˙gg−1 = Adgξ are referred to as spatial velocities. See Marsden
+and Ratiu [1999] for further details.
+For a mechanical system the Lagrangian has the form
+For a G-invariant mechanical Lagrangian the reduced
+Lagrangian may be written in the form
+l(r, r˙, ξ) =
+1
+2
+(ξT , r˙T )
+
+I IA
+ATI m(r)
+
+ξ˙
+r
+
+− V (r) ,
+where here I is the local form of the locked inertia tensor and A is the local
+form of the mechanical connection.
+
+Setting Ω = ξ + Ar˙ we obtain the block diagonal form
+l = lΩ(r, r˙,Ω) =
+1
+2
+(ΩT , r˙T )
+
+I 0
+0 m − ATIA
+
+Ω˙
+r
+
+−V (r) . (3.11.13)
+We can then compute the equations of motion in these reduced coordinates.
+Define the generalized momentum
+p = ∂l
+∂ξ
+= Iξ + IAr˙ .
+Suppose also that there is a G-invariant forcing F = (Fα, Fa), the components
+corresponding to base and fiber directions, respectively. Then the
+3.11 The Lagrange–Poincar´e Equations 149
+reduced equations of motion are
+g
+−1g˙ = ξ = −Ar˙ + I
+−1p , (3.11.15)
+p˙ = ad∗
+ξp + F , (3.11.16)
+˜M
+¨r + ˙rT ˜ C(r) ˙ r + ˜N + ∂V
+∂r
+= T(r)F,
+where ˜M (r) = m(r)−AT (r)I(r)A(r), and ˜ C(r) represents reduced Coriolis
+and centrifugal terms,
+r˙TC˜(r)r˙ = Cαβγr˙αr˙β =
+1
+2
+#
+∂ ˜Mαβ
+∂rγ + ∂ ˜Mαγ
+∂rβ
+− ∂ ˜Mγβ
+∂rα
+
+r˙βr˙α , (3.11.18)
+while
+)
+N˜, δr
+*
+=
+&
+p, dA( ˙ r, δr) − [A( ˙ r,A(δr)] +
+
+I
+−1p,A(δr)
+
++
+1
+2
+∂I−1p
+∂r
+(δr)
+'
+(3.11.19)
+and (T(r)F)α = Fα −FaAa
+α, Fa = Fbgba
+, with gba
+denoting the lifted action
+of the group.
+Noting that the Lagrange-Poincare equations are local equations (meaning?), since the coordinates correspond to a (local) trivialization of the reduced shape space bundle(?).
+
+
+
+
+
+Using the exponential map to parameterize the relative configuration manifolds of these 1-parameter subgroups of $\SE$, leads to the standard product of exponentials
+formula\cite{Chhabra2014a}. The product of exponentials formula, first introduced by Brockett\cite{brockett1984robotic} and further developed by Murray et al.\cite{murray1994mathematical}, with roots in Lie group and screw theory, provides an extension of the described parameterizations to calculate the kinematics of multi-body systems.
