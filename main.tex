@@ -9,6 +9,10 @@
 \usepackage{verbatim}
 \usepackage{graphicx}
 
+\usepackage{lipsum}
+\usepackage{mathtools}
+\usepackage{cuted}
+
 \usepackage{array}
 \usepackage{graphicx}
 \usepackage{cite}
@@ -23,17 +27,16 @@
 \usepackage{hyperref}
 \usepackage{cleveref}
 \usepackage{graphicx}
-\newcommand{\crefrangeconjunction}{ to~}
+%\newcommand{\crefrangeconjunction}{ to~}
 \usepackage{subcaption}
 \usepackage{enumitem}
 \usepackage{pgfgantt}
 %\usepackage{longtable}
  \usepackage{dingbat}
 % \usepackage{verbatim}
-
-\usepackage{amsfonts}
 \usepackage{amssymb}
 
+\setcounter{MaxMatrixCols}{20}
 
 %-------------------------------- Defitions
 \def \SE {\textbf{SE}(3)}
@@ -42,6 +45,8 @@
 \def \so {\textbf{so}(3)}
 \def \R  {\mathbb{R}}
 \def \g  {\mathfrak{g}}
+\def \q  {\mathfrak{q}}
+\def \m  {\mathfrak{m}}
 
 \def \V {\mathcal{V}}
 \def  \I {\mathcal{I}}
@@ -50,12 +55,44 @@
 \def \Ad {\textbf{Ad}}
 \def \Add {\mathfrak{Ad}}
 \def \L {\mathcal{L}}
+\def \A {\mathcal{A}}
+\def \O {{}^0\Omega^I_{loc}}
+\def \sin {\textbf{sin}}
+\def \cos {\textbf{cos}}
 
+\def \diag {\text{diag}}
 
 \newtheorem{theorem}{Theorem}
-\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{lemma}{Lemma}
 \renewcommand{\qedsymbol}{$\blacksquare$}
+% \newtheorem{example}{Example}
+
+
+%\newcommand{example}{\large \subsection}
+\theoremstyle{remark}
+\newtheorem{example}{Example}[subsection]
+\newtheorem{definition}{Definition}
 %------------------------------------------
+
+
+%-------------------------
+% TIKZ
+\usepackage{tikz}
+\usetikzlibrary{positioning}
+\usetikzlibrary{shapes.geometric}
+% Vector Styles
+\tikzstyle{load}   = [ultra thick,-latex]
+\tikzstyle{stress} = [-latex]
+\tikzstyle{dim}    = [latex-latex]
+\tikzstyle{axis}   = [-latex,black!55]
+
+% Drawing Views
+\tikzstyle{isometric}=[x={(0.710cm,-0.410cm)},y={(0cm,0.820cm)},z={(-0.710cm,-0.410cm)}]
+\tikzstyle{dimetric} =[x={(0.935cm,-0.118cm)},y={(0cm,0.943cm)},z={(-0.354cm,-0.312cm)}]
+\tikzstyle{dimetric2}=[x={(0.935cm,-0.118cm)},z={(0cm,0.943cm)},y={(+0.354cm,+0.312cm)}]
+\tikzstyle{trimetric}=[x={(0.926cm,-0.207cm)},y={(0cm,0.837cm)},z={(-0.378cm,-0.507cm)}]
+
+%-------------------------
 
 
 \hyphenation{}
@@ -63,7 +100,7 @@
     T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 \usepackage{balance}
 \begin{document}
-\title{Singularity-Free Lagrange-Poincare Equations for Vehicle-Manipulator Systems}
+\title{Singularity-Free Lagrange-Poincar\'{e} Equations on Lie Groups for Vehicle-Manipulator Systems}
 \author{IEEE Publication Technology Department
 \thanks{Manuscript created October, 2020; This work was developed by the IEEE Publication Technology Department. This work is distributed under the \LaTeX \ Project Public License (LPPL) ( http://www.latex-project.org/ ) version 1.3. A copy of the LPPL, version 1.3, is included in the base \LaTeX \ documentation of all distributions of \LaTeX \ released 2003/12/01 or later. The opinions expressed here are entirely that of the author. No warranty is expressed or implied. User assumes all risk.}}
 
@@ -76,7 +113,7 @@
 One of the advantages of the developed method is the independence of the forward and differential kinematics maps from the coordinate frame assignment to the intermediate bodies in the multi-body system.
 
 
-In this paper, we develop a novel singularity-free modelling approach for the dynamics of moving-base space manipulators chasing an non-cooperative target (?in the presence of external disturbing effects) in an orbital environment. We utilize the Lagrange-Poincaŕe (LP) equations by recognizing the independence of the dynamics from the base vehicle's configuration, resulting in a decoupling of the base vehicle's dynamics and the arms motion, reduction of the dynamics.%, that noisy joint acceleration/torque measurements are avoided in the computation of the vehicle motion due to manipulator interaction even while considering external forces.  
+In this paper, we develop a singularity-free modelling approach for the dynamics of moving-base space manipulators chasing an non-cooperative target (?in the presence of external disturbing effects) in an orbital environment. We utilize the Lagrange-Poincar\'{e} (LP) equations by recognizing the independence of the dynamics from the base vehicle's configuration, resulting in a decoupling of the base vehicle's dynamics and the arms motion, reduction of the dynamics.%, that noisy joint acceleration/torque measurements are avoided in the computation of the vehicle motion due to manipulator interaction even while considering external forces.  
 The core advantage of the proposed methods is physical con
 sistency without level-set assumptions on the momentum map.
 We validate this through experiments on both types of OGFM
@@ -102,15 +139,27 @@ motion” joints.
 
 \section{Introduction}
 
-\IEEEPARstart{S}{pace} missions, especially those involving handling objects in the Earth's or other planets' orbits, greatly benefit from reliable autonomous robotic systems that are capable of making local decisions.
+\IEEEPARstart{R}{obotic} servicing missions, particularly those that involve handling objects in remote or harsh environments, i.e., space\cite{moghaddam2021guidance}, underwater, building construction \cite{gawel2019fully,vstibinger2021mobile} and social environments, greatly benefit from reliable autonomy and local decision making capabilities.
+
 %Researchers have been investigating robotic means for servicing\cite{meintel1982remote, hinds1982satellite}, refueling, repairing, re-orbiting or retiring satellites in orbit. 
-A robot manipulator mounted on a vehicle, called vehicle-manipulator system (also referred to as space manipulator or chaser-manipulator system in this paper) is a compelling universal solution to many in-orbit autonomous operations\cite{Flores-abad2007}. 
+
+An autonomous robot manipulator mounted on a mobile vehicle, called a vehicle-manipulator system is a compelling solution to many robotic servicing operations\cite{Flores-abad2007}. 
 (?)Space manipulators provide predictable control over target's behaviour.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.45\textwidth]{building.png}\hfill\\[\smallskipamount]
+    
+    \includegraphics[width=0.22\textwidth]{Girona-500-I-AUV-Left-TRIDENT-configuration-Middle-RAUVI-TRITON-configuration.ppm.png}
+    \includegraphics[width=0.22\textwidth]{CanadarmFriend.jpg}
+    \caption{Examples of mobile manipulators for construction \cite{vstibinger2021mobile}, underwater recovery missions \cite{ribas2011girona} and in-orbit operations (credit: Canadian Space Agency)}
+    \label{fig:bulding}
+\end{figure}
 These systems are currently used for docking and handling payloads via teleoperation\cite{gibbs2002canada,king2001space, aikenhead1983canadarm}. 
 In a space manipulator, the base vehicle has all components of a satellite such as thrusters, Attitude Determination and Control System (ADCS), electronics, telemetry and other subsystems. Its payload is the robotic arm that is deployed once the space manipulator is in the vicinity of a target, in an in-orbit robotic mission.
 This article focuses on addressing common problems in the modelling of space-manipulator systems in the manipulator deployment phase. The space manipulator system is mathematically modeled as a multi-body system. The multi-body system consists of a 6 Degree-of-Freedom (DoF) vehicle and a manipulator with a series of joints, most commonly a 3-dof shoulder, a 1-dof elbow, and a 3-dof wrist.
 The aim is to analyse the dynamics and enable singularity-free planning and control of the robotic arm from a braked position to reach its end goal. 
-The major contributions presented in this article include a complete Lie Group formulation for moving-base multi-body systems with multi-DoF joints and a Lagrange-Poincare formulation of dynamics for a system on a cartesian product of a Lie Group (vehicle configuration) and a shape space (manipulator's internal states), providing a singularity-free representation of the base dynamics and multi-dof joints and effectively decoupling the external and internal dynamics\cite{park1995lie}. We incorporate an extension of the modeling methods for rigid-body mechanisms to be able to model more general joints the single-dof rotary and prismatic ones. 
+The major contributions presented in this article include a complete Lie Group formulation for moving-base multi-body systems with multi-DoF joints and a Lagrange-poincar\'{e} formulation of dynamics for a system on a cartesian product of a Lie Group (vehicle configuration) and a shape space (manipulator's internal states), providing a singularity-free representation of the base dynamics and multi-dof joints and effectively decoupling the external and internal dynamics\cite{park1995lie}. We incorporate an extension of the modeling methods for rigid-body mechanisms to be able to model more general joints the single-dof rotary and prismatic ones. 
 This includes all joints for which the configuration space is a Lie group, such as ball joints and 6-dof “free
 motion” joints. Common dynamic modelling approaches, such as Hamel equations and Lagrange equations, start from the assumption that the configuration space is isomorphic to $\R^n$. Inspired by the “change of basis” technique used in the constrained force algorithm \cite{}(?), a projection operator is incorporated to utilize exponential coordinates (generated by the Lie algebra) as local Euclidean coordinates. The total relative configuration space of two consecutive bodies in the chain can then be covered by an atlas of local exponential coordinate charts (patches?). The dynamics of a system on a single Lie group can be expressed globally in terms of the group and algebra structures. Locally, the dynamics can be expressed in these coordinates, resulting in explicit and
 singularity-free differential equations. The main advantages achieved are a reduced number of state variables and elimination of constraint equations (compared to implicit methods); improved numerical stability due to avoiding singularities; and generally easier integration into model-based control methods such as MPC, RL and computed torque by providing explicit differential equations without constraints. 
@@ -121,92 +170,31 @@ The paper is structured as follows:
 \section{Related Literature}
 \label{chap:MainBackground}
 
-The current work focuses on the modeling of a vehicle manipulator in the arm deployment phase of in-orbit robotic missions conducted by a vehicle-manipulator system.
-%\subsection{Prior to Deployment of Arm} \label{synch}
-%The relative linear and angular motion of the chaser and its target can synchronized in the close-range rendezvous phase and therefore, the multi-body system can have a non-zero total angular momentum during the deployment and autonomous motion control of the robotic arm from a braked position to reach its target.
-A vehicle-manipulator system is best represented as a multi-body system consisting of rigid bodies interconnected by ideal joints. It is critical to obtain a simple and yet geometrically meaningful model of the system that is capable of including the distinguishing characteristics of space manipulators. One such characteristic is possessing a freely moving 6-dof base body (vehicle). The consensus among the scientific society is that the ADCS system should be turned off when the end-effector goes into contact with the target to avoid any unexpected response of the control system. Therefore, it is always necessary to plan a free-floating scenario for the robotic system. Many formalisms have been proposed to model multi-body systems, among which screw theory for kinematics\cite{murray2017mathematical} and Hamiltonian/Lagrangian formulation for dynamics\cite{stramigioli2000hamiltonian,Chhabra2014a}{} are particularly advantageous due to their strong geometric roots. Free-floating space robots have un-actuated 6-dof base\cite{Tortopidis}{} introducing challenges for the trajectory planning and control of the system, while on the other hand, enabling the development of energy efficient control strategies\cite{Transactions2013}{} by making use of the internal couplings and the degree of controllability of the system\cite{huang2017path}{}. 
-Geometric mechanics is a branch of applied mathematics that studies nonlinear dynamical systems on their configuration manifolds that may or may not exhibit a Lie group structure. The methodology extensively incorporates tools in differential geometry to treat such complex systems in a coordinate-free manner. The configuration manifold includes all possible configurations of the system and the phase space consists of the required states to formulate the dynamics. For example, Lagrangian systems are described by the configurations and their velocities, i.e., elements of the tangent bundle $T\cQ$, and Hamilton's equation are defined based on the configurations and their conjugate momenta, i.e., elements of the cotangent bundle $T^*\cQ$. Therefore, dynamics of a regular system is a vector field on the phase space whose integral curve represents the time evolution of the system\cite{muller2016geometric}. In the case of a rigid vehicle-manipulator system, the configuration manifold of the system is of dimension $n+6$ and it is diffeomorphic to the set of all allowable relative transformations between the rigid bodies forming the system, which exhibits a Lie group structure. 
-The idea of reducing the phase space of a nonlinear system and accordingly its associated dynamics, initiated by Marsden and Weinstein\cite{MARSDEN1974} and K. Meyer\cite{meyer1973symmetries}, is at the core of geometric mechanics. Specifically in proximity operations, these free-floating systems are underactuated and non-holonomic due to the existence of an uncatuated base resulting in the conservation of momentum. 
-%The property of interest in the trajectory planning of an arm is mainly the absolute angular and linear velocity of the end-effector. 
-Trajectory planners have been extensively studied for coupled vehicle-Manipulator systems\cite{Huang2006,Chamitoff2014,King}. Motion of the arm cannot be studied independently of that of the vehicle. Ni et al. propose a shooting method which by varying the speed of the end effector and analyzing it through the theory of calculus of variations generates optimal trajectories\cite{ni2017trajectory}{}.
-Rybus and Seweryn investigated the differences between free-floating and free-flying vehicle-arm systems\cite{rybus2018manipulator} and studied trajectory optimization\cite{seweryn2008optimization}, application of Bezier curves for singularity avoidance\cite{Rybus2016}, and capture maneuvers for both cases \cite{rybus2018manipulator}. 
-Challenges arise due to non-holonomicity of the arm dynamics such as dynamic singularities\cite{Papadopoulos,Respondek2018} and the need for smooth obstacle avoidance\cite{Papadopoulos2005polynomial,rybus2018obstacle}{}. Importance of Obstacle avoidance and compensating for the contact forces when the end-effector goes into contact with the target? % are critical challenges in planning and control of this system\cite{nagamatsu1996capture}. Researchers minimize the contact reactions, or they design for an end-effector impedance when the chaser-manipulator system is in the final configuration to withstand the contact\cite{Yoshida2015}. A most common approach in dealing with the reaction forces upon impact is by minimizing the impact force via proper choice of the contact point and well-designed pre-impact trajectories. 
-A dynamic singularity occurs when the generalized Jacobian matrix\cite{Umetani1989} becomes singular. Tchon, Respondek and Ratajczak addressed this problem by utilizing normal forms of singularities of non-holonomic robots described by control-affine systems\cite{Respondek2018}{}. Robustness and stability of the trajectory following tasks are crucial in in-orbit missions\cite{King,rybus2016trajectory,seddaoui2017optimised}. (ADD??? robust:Boscariol:\cite{boscariol2016optimal}
-effect of non-zero momentum (ulrich, DLR) in presence of disturbances
-workspace vs joint-space trajectory planning.)
-Hussein and Bloch use theory of affine connections along with method of navigation functions and Lagrange multipliers to plan sub-optimal trajectories for a class of underactuated systems with non-holonomic constraints to avoid obstacles\cite{Hussein2008}. They also study constrained optimal trajectory following of a group of rigid bodies with configuration manifolds SE(3) in a finite time\cite{hussein2005constrained}{}. Shammas et al. analyze and generate gaits for mixed mechanical systems whose motion is simultaneously governed by a set of non-holonomic constraints and a conserved generalized momentum. Through proper recourse to geometric mechanics, they are able to show that the resulting motion has two portions: a geometric and a dynamic contribution\cite{pathshammas,pathshammas1}. 
-Recently, smart and efficient autonomous navigation techniques based on Riemannian motion policy have been introduced to use in deep learning for vehicle control purposes\cite{Mengnavigation} and demonstrated competent performance in indoor motion control and obstacle avoidance. Adaptive control schemes, due to their ability to adjust themselves according to external and internal changes, are beneficial in dealing with unknown environments and un-cooperative targets. Walker makes use of an adaptive controller to achieve stability despite the uncertainties in the dynamic and inertial parameters of a vehicle-manipulator system\cite{Walker1991}. Wang and Hanlei incorporate a generalized dynamic regressor in adaptive inverse dynamics study of a free-floating vehicle-arm system to account for the nonlinearities due to unknown or varying parameters\cite{Wang2011}. 
-Wee et al. demonstrated the capabilities of adaptive control methods in controlling trajectories of a free-floating vehicle and a 6-DOF arm simultaneously by having the adaptive logic acquire parameter estimations through momentum integrals\cite{Wee1997}. %They propose the following adaptive control command to be applied to joint \(i\)\cite{Walker1991}???????????????
-%\begin{equation}\tau_i=\sum_{j=1}^m\sum_{k=1}^m Tr[\frac{\partial (^IH_j^I)}{\partialq_i} (\tilde{U}_{jk})(^I\ddot{\tilde{H}}_k^I-\gamma{}^I\dot{\tilde{H}}_k^I)^T]\end{equation}
-%With the adaptation law
-%\begin{equation}\dot{\tilde{U}}_{jk}=-\alpha_{jk}(^I\dot{\tilde{H}}_k^I)(^I\ddot{\tilde{H}}_k^I-\gamma{}^I\dot{\tilde{H}}_k^I)\end{equation}
-%Where \(\gamma\) is a design parameter, \(\alpha\) is a convergence parameter and and \(\tilde{U}_{jk}\) is defined as
-%\begin{equation}{}^I\dot{\tilde{H}}_k^I=\sum_{i=1}^k \frac{\partial ^IH_k^I}{\partialq_i}\dot{\tilde{q}}_i\end{equation} 
-%With the augmented state error
-%\begin{equation}\dot{\tilde{q}}=\dot{q}_d-\lambdaq_e \quad \& \quad \ddot{\tilde{q}}=\ddot{q}_d-\lambda\dot{q}_e\end{equation}??????????????????
-Ulrich and Shi demonstrated an adaptive controller's ability to deal with large inertia uncertainties without the need for online estimation\cite{Shi2015}. Ulrich et al. also developed a passivity-based output feedback adaptive control law to improve the stability and robustness of a path-planner for vehicle-arm systems\cite{Ulrich2016}. Less complex adaptive control logics are proven to be effective in controlling space robotic arms despite their simplicity\cite{Ulrich2012}. Ulrich et al. evaluated the performance of a simple adaptive controller\cite{Ulrich2014}{}. 
-Adaptive controllers operate on the basis of tuning the control gains based on feedbacks received from the output of dynamical systems. 
-\begin{comment}
-Ulrich et al. propose a Direct Adaptive Control (DAC) based on an output feedback transpose Jacobian control law \cite{Ulrich2014} (Figure \ref{fig:adaptiveulrich}) for a sample 2-link manipulator:
-\begin{equation}\tau_\mathfrak{m} ={}^IJ^I_{ee}(q)^{\textbf{tr}}[K_p(t)e+K_d(t)\dot{e}],\end{equation}
-where $e$ is the end-effector position error.  
-%the tracking error is
-%\begin{equation}e={^IX_{des}^{I}}-{^IX^I_{ee}},\end{equation}
-%and \({^IX^I_{ee}}\) is the current pose of the end-effector and \({^IX_{des}^{I}}\) is the desired end-effector pose.
-%There are various means by which to generate the controller gains which typically depend on the tracking error in simple adaptive controllers. 
-One adaptation logic suggested by Ulrich for their Modified Simple Adaptive Controller (MSAC) is\cite{Ulrich2014}
-\begin{equation}K_p=(ee^{\textbf{tr}}\Gamma_{pp})+\int (ee^{\textbf{tr}}\Gamma_{pi}-\delta_pK_{pi}I_{6 \times 6})dt,\end{equation}
-and
-\begin{equation}K_d=(ee^{\textbf{tr}}\Gamma_{dp})+\int (ee^{\textbf{tr}}\Gamma_{di}-\delta_dK_{di}I_{6\times 6})dt,\end{equation}
-where $\Gamma_{pp}$, $\Gamma_{pi}$ , $\Gamma_{dp}$ and $\Gamma_{di}$ are control
-parameters adjusted by the designer and $\delta_p$ and $\delta_d$ are small
-positive control coefficients used to prevent the integral terms of the control gains from diverging\cite{Ulrich2014}.
-% add model predictive: Direct Model Reference Adaptive Control of a Flexible Joint Robot
- Another common adaptive control approach, named Model Reference Adaptive Control (MRAC), includes a reference model and incorporates the output of the model $x_\mathfrak{m}$ along with a scalar reference model input 
-signal $\nu_\mathfrak{m}$ in the overall control signal\cite{Ulrich2010a}
-\begin{equation}\tau_\mathfrak{m}=\begin{bmatrix}K_e(t) & K_{x_\mathfrak{m}}(t) & K_{\nu_\mathfrak{m}}(t)\end{bmatrix}\begin{bmatrix}e\\x_\mathfrak{m}\\ \nu_\mathfrak{m}\end{bmatrix},\end{equation}
-and the control gains are adapted via
-\begin{equation}\begin{bmatrix}K_e(t) \\ K_{x_\mathfrak{m}}(t) \\ K_{\nu_\mathfrak{m}}(t)\end{bmatrix}^{\textbf{tr}}=e\begin{bmatrix}e \\ x_\mathfrak{m} \\ \nu_\mathfrak{m}\end{bmatrix}^{\textbf{tr}} \Gamma_p+\int e\begin{bmatrix}e \\ x_\mathfrak{m} \\ \nu_\mathfrak{m}\end{bmatrix}^{\textbf{tr}} \Gamma_{i},\end{equation} 
-
-where $\Gamma_{p}$ and $\Gamma_{i}$ are control parameters, and $K_e(t)$, $K_{x_\mathfrak{m}}(t)$ and $K_{\nu_\mathfrak{m}}(t)$ are gains corresponding to the error, system model output and model input, respectively\cite{Ulrich2010a}.
-
-\end{comment}
-Cao and Silva use Neural-Networks to aid their adaptive controller in path-planning for a space robot with flexible joints and links\cite{cao2006dynamic}.
-A closed-loop adaptive control requires a sensory system accompanied with a reliable state estimation. 
-Ulrich and Sasiadek couple an EKF with an adaptive controller\cite{Ulrich2011a} to develop an adaptive feedback, feed-forward controller for a manipulator with elastic uncertainties at joints\cite{Ulrich2014a}. They demonstrate the adaptation capabilities of a direct adaptive fuzzy control to track the errors between a model and a real space robot\cite{Ulrich2011b}. Sasiadek and Green also apply a fuzzy logic system to adapt the gains of a transpose Jacobian controller in a flexible link robot\cite{Green2005}. 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%\subsection{Model-Predictive Adaptive Control Based on Geometric Mechanics} 
-Zhenyu Li proposes a self-tuning adaptive control scheme for free-floating space robots with unknown mass properties based on least-square estimation technique\cite{li2016target}. Shibli, Su, and Aghili developed an adaptive controller based on the inverse dynamics of a free-flying space manipulator to perform contact operations\cite{shibli2006adaptive}{}. 
-%(Model Predictive Control have a separate section? didn't have enough specific papers to separate adaptive and %model reference, though I should have been able to if I had time) 
-Challenges may stem from the uncertainties in the chaser-arm system and its environment, for example, uncertainties in the target model\cite{Abiko}, unaccounted elastic behaviours in the robotic system or the target\cite{Sharf1995,ishijima2005orbit}, and external and internal disturbances\cite{guo2008terminal,Hrobustdevelopment} . Variational-structure control\cite{Wei2011,Saaj2014}{}, robust and adaptabive\cite{Ulrich2015,Ulrich2014a,Sasiadek1988} can address this need.
-Therefore, advanced control methodologies capable of handling uncertainties, such as adaptive, robust and sliding mode controllers\cite{saaj2002new,Ulrich2010,Ulrich2014} have been extensively studied in the literature for vehicle-manipulator systems. 
 
 \section{Kinematics of Vehicle-Manipulator Systems on Lie Groups}
 \label{math} %\section{Mathematical Background}
 %\section{Abstract}
-In this section, we provide the kinematic framework that is utilized throughout the article to describe the relative motion of rigid bodies in a moving-base multi-body system based on the Lie Group theory. 
-
-
-\subsection{Relative Rigid Body Pose and Velocity}
+In this section, we provide the kinematics framework that is utilized throughout the article to describe the relative motion of rigid bodies in a moving-base multi-body system based on the Lie Group theory. 
+\subsection{Relative Pose and Velocity}
 \label{rigidbodykinematics}
 %The goal of this section is to provide a formalism for describing motion of a rigid body with respect to a reference coordinate frame or another rigid body. 
-Let us consider two rigid bodies in the multi-body system indexed by $i$ and $j$, and attach two orthonormal coordinate frames to them. A relative pose $g^j_i$ between Body $i$ and Body $j$ is a map from the coordinate frame attached to body $i$ to that attached to body $j$ that is isometric and orientation-preserving. The set of all such relative poses forms a smooth manifold that is called the relative configuration manifold and is denoted by $G^j_i$. An element $g^j_i\in G^j_i$ can be represented via %either represented via the pair $(R^j_i,{}^jp^j_i)$ or alternatively via 
-\begin{equation}
-    g^j_i=\begin{bmatrix}R^j_i & ^jp^j_i\\\boldsymbol{0} &1\end{bmatrix} 
-\end{equation}
-where ${R^j_i} \in \SO$ is a ${3 \times 3}$ matrix that describes the orientation of the coordinate frame attached to Body $i$ relative to that attached to Body $j$, and $^jp^j_i \in \R^3$ is the vector of relative linear position between the origins of the same coordinate frames expressed in the frame of Body $j$. %Let us denote the space of all coordinate transformations of Body $i$ by $G^i_i \cong \SE$ and Body $j$ by $G^j_j \cong \SE$. 
+Let us consider two rigid bodies in the multi-body system indexed by $i$ and $j$, and attach two orthonormal coordinate frames to them. A relative pose $g^j_i$ between Body $i$ and Body $j$ is a map from the coordinate frame attached to body $i$ to that attached to body $j$ that is isometric and orientation-preserving. The set of all such relative poses forms a smooth manifold that is called the relative configuration manifold and is denoted by $G^j_i$.  %Let us denote the space of all coordinate transformations of Body $i$ by $G^i_i \cong \SE$ and Body $j$ by $G^j_j \cong \SE$. 
 Fixing a relative pose, say $\bar{g}^j_i$, there exists an identification of $G^j_i$ by the space of coordinate transformations of Body $i$, $G^i_i$, through left translation , i.e. $G^j_i={\bar{g}^j_i}G^i_i$, and one by $G^j_j$ through right translation, i.e. $G^j_i=G^j_j{\bar{g}^j_i}$. The spaces of coordinate transformations $G^i_i$ and $G^j_j$ are both isomorphic to the Special Euclidean group $\SE$, as Lie groups, and their Lie algebras, respectively denoted by $\g_i^i$ and $\g_j^j$, are isomorphic to $\se$ (the Lie algebra of $\SE$). %$G^j_i$ will then be diffeomorphic to the Special Euclidean Group $\SE$.
 %--------------------
 %\subsubsection{Relative Velocity of Rigid Bodies} 
 \label{difkinrigid}
 %For two rigid Bodies $j$ and $i$ , the relative motion of one with respect to the other is a smooth curve $g^j_i(t):[t_0,t_f]\rightarrow G^j_i$ on the relative configuration manifold $G^j_i$. 
+An element $g^j_i\in G^j_i$ can be represented via %either represented via the pair $(R^j_i,{}^jp^j_i)$ or alternatively via 
+\begin{equation}
+    g^j_i=\begin{bmatrix}R^j_i & ^jp^j_i\\\mathbb{O}_{1\times 3} &1\end{bmatrix} 
+\end{equation}
+where ${R^j_i} \in \SO$ is a ${3 \times 3}$ matrix that describes the orientation of the coordinate frame attached to Body $i$ relative to that attached to Body $j$, and $^jp^j_i \in \R^3$ is the vector of relative linear position between the origins of the same coordinate frames expressed in the frame of Body $j$. $\mathbb{O}_{1\times3}$ is the $1\times 3$ zero matrix.
 For a curve $g_i^j(t)\in G_i^j$, the relative velocity of Body $i$ with respect to Body $j$, $\dot{g}^j_i(t)=\frac{d}{dt}g^j_i(t)$, can be observed in the coordinate frame of Body $i$ or Body $j$ via left translation $^i\hat{V}_i^j={g^j_i(t)}^{-1}\dot{g}^j_i(t)\in\mathfrak{g}_i^i$ or right translation $^j\hat{V}_i^j=\dot{g}^j_i(t){g^j_i(t)}^{-1}\in\mathfrak{g}_j^j$, respectively. 
-The wedge operator is the vector space isomorphism between $\R^6$ and $\se$, such that,
+The \textit{hat} operator is the vector space isomorphism between $\R^6$ and $\se$, such that,
 \begin{equation}
     \hat{V}:=\begin{bmatrix}\tilde{\omega} & v\\0 & 0\end{bmatrix},
 \end{equation}
-for every $V=[\omega^T\quad v^T]^T\in \R^6$, where $\tilde{\omega}$ is an element of the Lie algebra of $\SO$, denoted by $\so$, and $v \in \R^3$, corresponding to the angular and linear velocities, respectively. The \textit{tilde} operator transforms a vector $\omega\in\R^3$ to a $3 \times 3$ skew-symmetric matrix, such that $\tilde{\omega}p=\omega\times p$, for every $p\in\R^3$. Given the curve $g_i^j(t)$, the two relative velocity matrices are calculated as
-%The inverse of the wedge operator is denoted by \textit{vee}. 
+for every $V=[\omega^T\quad v^T]^T\in \R^6$, where $\tilde{\omega}$ is an element of the Lie algebra of $\SO$, denoted by $\so$, and $v \in \R^3$, corresponding to the angular and linear velocities, respectively. The inverse of the \textit{hat} operator is denoted by \textit{vee}, i.e., $\hat{V}^\vee=V$. The \textit{tilde} operator transforms a vector $\omega\in\R^3$ to a $3 \times 3$ skew-symmetric matrix, such that $\tilde{\omega}p=\omega\times p$, for every $p\in\R^3$. Given the curve $g_i^j(t)$, the two relative velocity matrices are calculated as
 \begin{align}
     \begin{split}
    ^i\hat{V}_i^j:&=\begin{bmatrix}({R}^j_i)^T\dot{R}^j_i & (R^j_i)^T{}^j\dot{p}^j_i\\0 & 0\end{bmatrix} \in \g^i_i,\\
@@ -231,19 +219,27 @@ The $6 \times 6$ \textit{Adjoint matrix} which transforms the $\R^6$ representat
 \begin{equation}
     \Ad_{g_i^ j}:=\begin{bmatrix}R_i^ j & (^ j\tilde{p}_i^ j) R_i^ j \\0& R_i^ j\end{bmatrix},
 \end{equation}
-such that $^j{V}_i^j=\Ad_{g^j_i}{}^i{V}_i^j$. Based on the Lie bracket of the Lie algebras $\g^i_i$ and $\g^j_j$, we can define the \textit{adjoint operator} $\textbf{ad}_{{}^jV^j_i}(\cdot):=[{^jV^j_i},(\cdot)]$,
+such that 
+\begin{equation}
+    ^j{V}_i^j=\Ad_{g^j_i}{}^i{V}_i^j.
+    \label{veladj}
+\end{equation} 
+Based on the Lie bracket of the Lie algebras $\g^i_i$ and $\g^j_j$, we can define the \textit{adjoint operator} $\textbf{ad}_{{}^jV^j_i}(\cdot):=[{^jV^j_i},(\cdot)]$,
 where in matrix form
 \begin{equation}
-\textbf{ad}_{{}^jV^j_i}=\begin{bmatrix}^j\tilde{\omega}_i^{j} & 0\\^j\tilde{v}_i^{j} & ^j\tilde{\omega}_i^{j}\end{bmatrix}.
+\textbf{ad}_{{}^jV^j_i}=\begin{bmatrix}^j\tilde{\omega}_i^{j} & \mathbb{O}_{3\times 3}\\^j\tilde{v}_i^{j} & ^j\tilde{\omega}_i^{j}\end{bmatrix}.
 \label{adjlow}
 %\textbf{ad}_{{}^j{V}_i^j}
 \end{equation}
 
 
 %%%%%%%%%%%%%%%%%%%
-\subsubsection{Joints} \label{joints}
-A joint is a mechanism that restricts the relative motion of body $i$ with respect to body $j$.% to a subset of the tangent bundle of the relative configuration manifold $TG^j_i$. 
-Here, we exclusively consider 1-degree-of-freedom (dof) joints with the restricted relative configuration manifold $Q_i^j$ (by an abuse of naming convention) correspoding to a single admissible direction of relative velocity, where $Q_i^j$ through left (right) translation maps to a 1-parameter Lie subgroup of $G_i^i$ ($G^j_j$). %Here, we exclusively utilize joints where this subset defines a distribution that corresponds to admissible directions of relative velocity of body $i$ with respect to body $j$ at every relative pose. 
+\subsection{Constrained Relative Motion}
+%\subsubsection{1-dof Joints} \label{joints}
+A joint is a mechanism that restricts the relative motion of body $i$ with respect to body $j$. % to a subset of the tangent bundle of the relative configuration manifold $TG^j_i$. 
+In this paper, we consider multi-degree-of-freedom (dof) joints to describe the motion of the base vehicle. We assume that the restricted relative configuration manifold (by an abuse of naming convention) $Q^j_i\subseteq G_i^j$ for a multi-dof joint can be mapped to a $b$-dimensional Lie sub-group of $G^i_i$ or $G^j_j$ through the left or right translation map, using a fixed $\bar{g}^j_i \in Q^j_i$. Let $Q_i^i:=(\bar{g}_i^j)^{-1}Q^j_i\subseteq G_i^i$ be the Lie sub-group associated with $Q_i^j$ whose Lie  sub-algebra is $\mathfrak{q}_i^i\subseteq \g_i^i$.  The dimension $b$ can take values in the set $\{1,2,3,4,6\}$ corresponding to different conjugacy classes of displacement subgroups of $\SE$ \cite{Chhabra2014a}. Such a category of joints can describe the configuration of a wide variety of vehicles, e.g., rovers, drones, spacecraft, rail vehicles, etc., whose motion can include multiple directions. In this paper, we do not use any explicit parametrization of the relative configuration manifold of the base vehicle.
+\subsubsection{Parametrization of 1-dof Joints}
+We exclusively consider $1$-dof joints for the manipulator. Their restricted relative configuration manifold $Q_i^j$  corresponds to a single admissible direction of relative velocity, where $Q_i^j$ through left (right) translation maps to a 1-parameter Lie subgroup of $G_i^i$ ($G^j_j$). %Here, we exclusively utilize joints where this subset defines a distribution that corresponds to admissible directions of relative velocity of body $i$ with respect to body $j$ at every relative pose. 
 %Let us denote the space of all admissible relative poses of body $i$ with respect to body $j$ considering the joint constraints by $Q^j_i$, and hereinafter call it the relative configuration manifold, by an abuse of naming convention. The dimension of $Q^j_i$ is named the degree-of-freedom (dof) of the joint. 
 %The appropriate parameterization of $Q^j_i$ is one of the critical practical problems in mechanics, due to its influence on the efficiency of dynamical analysis and control of multi-body systems. 
 %Let us fix $\bar{g}^j_i \in Q^j_i$ and 
@@ -277,7 +273,7 @@ The use of Rodrigues' formula provides a means for calculating the exponential t
     e^{\hat{\xi}q}=\begin{bmatrix} e^{\tilde{\varpi}q}& (I-e^{\tilde{\varpi}q})(\tilde{\varpi} \time {}v)+\varpi {\varpi}^T \nu q \\0 &1\end{bmatrix}, &\quad |\varpi| = 1
     \end{split}
 \end{equation}
-where the exponential term $e^{\tilde{\varpi}}=R \in \SO$ corresponds to the rotation part of a transformation, found from Rodrigues' formula ($|\varpi|=1$) \cite{murray1994mathematical}:
+where the exponential term $e^{\tilde{\varpi}q}=R \in \SO$ corresponds to the rotation part of a transformation, found from Rodrigues' formula ($|\varpi|=1$) \cite{murray1994mathematical}:
 \begin{equation}
     e^{\tilde{\varpi}q}=I+\tilde{\varpi}\sin(q)+ \tilde{\varpi}^2\big(1-\cos (q)\big),
 \end{equation}
@@ -285,89 +281,450 @@ where the exponential term $e^{\tilde{\varpi}}=R \in \SO$ corresponds to the rot
 %expand $ e^{\hat{\omega}^j_iq_i}$.
 and the term $(I-e^{\hat{\varpi}q})(\varpi \time {}\nu)+\varpi {\varpi}^T \nu q$ represents the linear translation. 
 
-\subsection{Moving-Base Manipulator System Kinematics}\label{kinematics}
-A vehicle-manipulator system moving with respect to an inertial frame $\mathcal{I}$ can be modelled as an open-chain multi-body system. An open-chain multi-body system is a collection of $n$ bodies and $n-1$ joints between the bodies. The coordinate frame of the base vehicle $\B$ is indexed $0$. To avoid complexity in notation, we only study a single-branch arm. The extension of this work to multi-branch manipulators is straightforward. It is advantageous to attach reference frames to each link at the joints and to express the quantities associated with each link in terms of these local frames. The manipulator links are indexed by the set $\{1,\cdots,n\}$, where $n$ corresponds to the end-effector and is interchangeably referred to as $ee$.
-Let $Q^I_0$ denote the relative configuration manifold of the base vehicle with respect to the inertial frame $\mathcal{I}$, which, in this study. As specified in Section \ref{joints}, the relative configuration manifold $Q^{I}_0$ is identified via a Lie group through the left translation by a fixed relative pose $\bar{g}^I_0{} \in Q_0^I$. The developed formulation of this article is applicable to any moving-base manipulator system where the motion of the base can be identified via a Lie Group (e.g. planar motion, ball joint, rail, or $\SE$ as in drones, aircraft and vehicles). We have chosen the initial relative configuration in a robotic operation as the aforementioned fixed pose $\bar{g}^I_0{}$. To avoid singularities due to parameterization, we will directly work with members of $Q^I_0$ when formulating the kinematics and dynamics of the system. %This treatment of the base configuration avoids all forms of kinematic singularities in their entirety.  %(?) $D^o_b$ and $D^I_b$ are therefore 6-DoF spaces. 
-The relative configuration manifolds $Q^{i-1}_i $ $(i=1, \cdots, n) $ of consecutive manipulator links, on the other hand, are parameterized using the exponential map: $$g_i^{i-1}=\exp{({}^{i-1}\hat{\xi}^{i-1}_iq_i)}\bar{g}^{i-1}_i\in Q_i^{i-1}$$ where ${}^{i-1}\hat{\xi}^{i-1}_i$ is the joint axis defined in \eqref{twist1}, $q_i$ is the joint parameter, and $\bar{g}^{i-1}_i$ belongs to $Q^{i-1}_i$. Here, we only consider one-parameter sub-groups of $\SE$ to describe the relative configuration manifolds of the manipulator joints, which correspond to 1-dof rotary, prismatic and helical joints. %Therefore, an exponential formulation of robot joint motion is utilized to form the relative position  of each manipulator body $i$ with respect to its preceding body in the chain $j$ based on the joint parameter $q_i$. %The manipulator joints are modeled as 1-DoF rotary and prismatic joints. so their $D_i^j$ is a 1-DoF space. 
-Let $Q_\mathfrak{m}$ denote the $n$-dimensional configuration manifold of the manipulator. An element $q_\mathfrak{m} \in Q_\mathfrak{m}$ consists of a set of joint parameters of the manipulator $[q_1,\cdots,q_n]^T$. Let $Q$ denote the $n+6$-dimensional configuration manifold of the space manipulator. An element $q \in Q$ consists of a set of velocities of the base vehicle and joint parameters of the manipulator.%The configuration manifold $Q_\mathfrak{m}$ includes all possible values of the joint parameters.
+\subsection{Vehicle-Manipulator System Kinematics}\label{kinematics}
+A vehicle-manipulator system moving with respect to an inertial frame $\mathcal{I}$ can be modelled as an open-chain multi-body system. To avoid complexity in notation, we only study a single-branch arm, i.e., a serial-link multi-body system. The extension of this work to multi-branch manipulators is straightforward. A serial-link multi-body system is a collection of $n+1$ bodies indexed by $\{0,1,\cdots, n\}$, where $0$ corresponds to the base vehicle, and $n+1$ joints between the consecutive bodies labeled by the succeeding body's index. %The coordinate frame of the base vehicle $\B$ is indexed by $0$. 
+We attach reference frames to each link at its preceding joint and express its inertial parameters in these local frames. %The manipulator links are indexed by the set $\{1,\cdots,n\}$, where $n$ corresponds to the end-effector and is interchangeably referred to as $ee$.
+Let $Q^I_0$ denote the $b$-dimensional relative configuration manifold of the base vehicle with respect to the inertial frame $\mathcal{I}$. The relative configuration manifold $Q^{I}_0$ is identified via a Lie group through the right translation by a fixed relative pose $\bar{g}^I_0{} \in Q_0^I$. %The developed formulation of this article is applicable to any moving-base manipulator system where the motion of the base can be identified via a Lie group (e.g. planar motion, ball joint, rail, or $\SE$ as in drones, aircraft and vehicles). 
+We have chosen the initial relative configuration of in a robotic operation as the aforementioned fixed pose $\bar{g}^I_0{}$. To avoid singularities due to parameterization, we will directly work with members of $Q^I_0$ when formulating the kinematics and dynamics of the system. %This treatment of the base configuration avoids all forms of kinematic singularities in their entirety.  %(?) $D^o_b$ and $D^I_b$ are therefore 6-DoF spaces. 
+Since we only consider 1-dof joints for the manipulator system, the relative configuration manifolds $Q^{i-1}_i $ $(i=1, \cdots, n) $ of consecutive manipulator links, are parameterized using the exponential map: 
+\begin{align}
+g_i^{i-1}=\exp{({}^{i-1}\hat{\xi}^{i-1}_iq_i)}\bar{g}^{i-1}_i\in Q_i^{i-1}\label{expparam}
+\end{align}
+where ${}^{i-1}\hat{\xi}^{i-1}_i$ is the joint axis defined in \eqref{twist1}, $q_i$ is the joint parameter, and $\bar{g}^{i-1}_i$ belongs to $Q^{i-1}_i$. %Here, we only consider one-parameter sub-groups of $\SE$ to describe the relative configuration manifolds of the manipulator joints, which correspond to 1-dof rotary, prismatic and helical joints. %Therefore, an exponential formulation of robot joint motion is utilized to form the relative position  of each manipulator body $i$ with respect to its preceding body in the chain $j$ based on the joint parameter $q_i$. %The manipulator joints are modeled as 1-DoF rotary and prismatic joints. so their $D_i^j$ is a 1-DoF space. 
+Let $Q_\mathfrak{m}$ denote the $n$-dimensional configuration manifold of the manipulator. An element $q_\mathfrak{m} \in Q_\mathfrak{m}$ consists of a set of joint parameters of the manipulator $[q_1,\cdots,q_n]^T$. We also denote the $(b+n)$-dimensional configuration manifold of the vehicle manipulator by $Q:=Q^I_0 \times Q_\mathfrak{m}$. %An element $q \in Q$ is a tuple $\{g_0^I,q_m\}$ consisting of pose of the base vehicle and joint parameters of the manipulator.%The configuration manifold $Q_\mathfrak{m}$ includes all possible values of the joint parameters.
 \subsubsection{Forward Kinematics}
 \label{forwardkinematics}
 %A configuration of the moving-base open-chain multi-body system is defined as the collection of relative configurations of the individual bodies $q:=(g^I_0 ,q_\mathfrak{m}) \in Q^I_0 \times Q_\mathfrak{m}$.
 Given a base configuration $g^I_0 \in Q_0^I$, and a set of joint angles $q_\mathfrak{m} \in Q_\mathfrak{m}$,  % and the geometry of the vehicle, arm and the orbits, 
-the \textit{Forward Kinematics} (FK) is a smooth map from $q:=(g^I_0 ,q_\mathfrak{m}) \in Q^I_0 \times Q_\mathfrak{m}$ to the pose of one of the bodies in the chain with respect to a chosen frame. For the purposes of this section, this reference frame can be the base vehicle's or the inertial frame.
-The configuration of the end-effector with respect to the inertial frame is formed by concatanating the individual rigid motions
+the \textit{Forward Kinematics} (FK) is a smooth map from $q:=(g^I_0 ,q_\mathfrak{m}) \in Q$ to the relative pose of a body in the chain with respect to a chosen frame. For the purposes of this study, this reference frame can be the base vehicle's or the inertial frame.
+The pose of Body $i$ with respect to the inertial frame is formulated by:
 \begin{equation}
-    g^I_{n}=g^I_{0}g^0_1(q_1)...g^{n-1}_{n}(q_{n}).
+    g^I_{i}(g^I_0, q_\mathfrak{m})=g^I_{0}g^0_{i}(q_\mathfrak{m}),
 \end{equation}
-The base vehicle's configuration 
+where the base vehicle's configuration is
 %\begin{equation}
 %    g^I_o(q_o)=e^{\hat{\xi}_{o_\theta}q_{o_\theta}}e^{\hat{\xi}_{o_r}q_{o_r}}g^I_o(0)
 %\end{equation}
 \begin{equation}
-    g^I_0 =\begin{bmatrix}R^I_0 & ^Ip^I_0\\0&1\end{bmatrix}
+    g^I_0 =\begin{bmatrix}R^I_0 & ^Ip^I_0\\0&1\end{bmatrix},
 \end{equation}
-results directly from it's rigid body dynamics. For simplicity, $^Ip^I_0$ and $R^I_0$ are the position of the center of mass of the base vehicle and its orientation with respect to the inertial frame expressed in the same frame. %The generalized exponential formula for the Forward Kinematics map corresponding to the manipulator can be formulated as
-The configuration of each of the bodies in the manipulator can be calculated with respect to the vehicle frame and the inertial frame, and represented in the same frames respectively via the use of generalized exponential formula:
+%For simplicity, $^Ip^I_0$ and $R^I_0$ are the position of the center of mass of the base vehicle and its orientation with respect to the inertial frame expressed in the same frame. %The generalized exponential formula for the Forward Kinematics map corresponding to the manipulator can be formulated as
+and based on \eqref{expparam}, the product of exponentials formula \cite{murray1994mathematical} leads to
 \begin{equation}
-    g^0_i(q_\mathfrak{m})=e^{\hat{\xi}_{1}q_{1}}...e^{\hat{\xi}_{i}q_{i}}\bar{g}^0_{i},
+    g^0_i(q_\mathfrak{m})=e^{\hat{\xi}_{1}q_{1}}...e^{\hat{\xi}_{i}q_{i}}\bar{g}^0_{i}.
 \end{equation}
+%\begin{equation}
+%    g^I_i(g^I_0, q_\mathfrak{m})=g^I_0e^{\hat{\xi}_{1}q_{1}}...e^{\hat{\xi}_{i}q_{i}}\bar{g}^0_{i},
+%\end{equation}the configuration of body $i$ with respect to the vehicle frame represented in the same frame via the use of generalized exponential formula is:
+Here, $\bar{g}^0_i=\bar{g}^0_1\cdots \bar{g}^{i-1}_i$ is a fixed relative pose of Body $i$ with respect to the vehicle (commonly chosen to be the initial pose), and the new notation
 \begin{equation}
-    g^I_i(g^I_0, q_\mathfrak{m})=g^I_0e^{\hat{\xi}_{1}q_{1}}...e^{\hat{\xi}_{i}q_{i}}\bar{g}^0_{i},
+  {\xi}_i:= \Ad_{\bar{g}^0_{i-1}}{}^{i-1}{\xi}^{i-1}_i\in(\mathfrak{g}_0^0)^\vee, \label{twist}
 \end{equation}
-were $\bar{g}^0_i$ is a fixed relative configuration of Body $i$ with respect to the vehicle (commonly chosen to be the initial configuration), and the new notation $\hat{\xi}_i={}^{\bar{0}}\hat{\xi}^{i-1}_i$ represent the manipulator joint twist matrices in the multi-body chain, calculated rigorously in Section \ref{diffkin}:
+represent the manipulator's joints' twist matrices expressed in the base vehicle's initial coordinate frame. % calculated rigorously in Section \ref{diffkin}:
+%\begin{equation}
+%    ^{\bar{0}}\hat{V}^{i-1}_i=\big(\Ad_{\bar{g}^0_{i-1}}{}^{i-1}\hat{V}_{i}^{i-1}\big)=^{\bar{0}}\hat{\xi}^{i-1}_i\dot{q}_i=\hat{\xi}_i\dot{q}_i
+ %   \label{twist}
+%\end{equation}
+In order to calculate the kinetic energy of the system, we further require to find the pose of the center of mass of Body $i$ with respect to $\mathcal{I}$, denoted by $g^I_{cm,i}$, as:
 \begin{equation}
-    ^{\bar{0}}\hat{V}^{i-1}_i=\big(\Ad_{\bar{g}^0_{i-1}}{}^{i-1}\hat{V}_{i}^{i-1}\big)=^{\bar{0}}\hat{\xi}^{i-1}_i\dot{q}_i=\hat{\xi}_i\dot{q}_i
-    \label{twist}
+    g^I_{cm,i}=g^I_i\,\bar{g}^i_{cm,i}=g^I_0e^{\hat{\xi}_{1}q_{1}}...e^{\hat{\xi}_{i}q_{i}}\bar{g}^0_{cm,i},
 \end{equation}
-In order to calculate the kinetic energy, we need to find the pose of the centers of mass of the bodies instead of their coordinate frames:
+where $\bar{g}^i_{cm,i}$ and $\bar{g}^0_{cm,i}$ are the constant pose of the coordinate frame attached to the center of mass of Body $i$ with respect to the corresponding joint coordinate frame and the base vehicle's initial frame, respectively.
+
+\begin{example}{ \textit{Planar Vehicle:}}
+The forward kinematics of a manipulator mounted on a planar vehicle is formulated in the following section. The vehicle can be considered as a 3-dof moving joint as can be seen in Figure \ref{fig:planar}. The multi-body system consists of three bodies, one base joint and two single-dof perpendicular manipulator joints.
+
+\begin{figure}[htbp]
+\begin{center}
+
+\begin{tikzpicture}[scale=0.4]
+% ground
+\draw[fill=gray!4, fill opacity=1] (7.5,-1,9) -- (7.5,-1,-4) -- (-5,-1,-4) -- (-5,-1,9) -- cycle; 
+
+% Wheel back  
+        \node[cylinder, draw, cylinder body fill = gray, minimum width=30, fill=gray!120] (c) at (-3,-1.3,-0.3) {};
+
+% Orbit Axes
+        \coordinate (O) at (0,0,0) node[below right]{$B$};
+        \draw[axis] (O) -- ++(1.5,0,0) node[right] {$x$};
+        \draw[axis] (O) -- ++(0,1.5,0) node[above right] {$y$};
+        \draw[axis] (O) -- ++(0,0,1.5) node[above] {$z$};
+
+%Base Sat
+
+    \draw[fill=gray!35, fill opacity=1] (-2,-2,2) -- (-2,0.7,2) -- (2,0.7,2) -- (2,-2,2) -- cycle; 
+    \draw[fill=gray!70, fill opacity=1] (2,0.7,2) -- (2,0.7,-2) -- (2,-2,-2) -- (2,-2,2) -- cycle; 
+    \draw[fill=gray!4, fill opacity=1] (2,0.7,2) -- (2,0.7,-2) -- (-2,0.7,-2) -- (-2,0.7,2) -- cycle; 
+        
+% joint 1        
+        \draw[fill=gray!50] (0,0,2) circle (0.4); 
+        \draw[fill=gray!20] (O,0,2.1) circle (0.4);
+        %\filldraw[ball color=white] (0,0,2.1) circle (0.3);
+        \draw[fill=gray!15] (O,0,2.4) circle (0.2);
+    \fill[fill=gray!15] (0,0.1,2.3) -- (0,-0.1,2.3) -- ++(0,0,3) -- (0,0.1,5.3) -- cycle;
+    \draw (0,0.1,2.3) -- ++(0,0,3);
+    \draw (0,-0.1,2.3) -- ++(0,0,3) node[right,midway];
+    
+     \node[cylinder, draw, cylinder body fill = white!50, minimum width=11, fill=grey!7] (c) at (-0.2,0,2) {};
+
+% Link 1
+    \draw[fill=gray!15] (O,0,2.4) circle (0.2);
+    \fill[fill=gray!15] (-0.175,0.1,2.3) -- (0.175,-0.1,2.3) -- ++(0,0,3) -- (-0.175,0.1,5.3) -- cycle;
+    \draw (-0.175,0.1,2.3) -- ++(0,0,3);
+    \draw (0.175,-0.1,2.3) -- ++(0,0,3) node[right,midway];
+
+% joint 2
+        \draw (-0.2,0.4,5.2) -- (0.2,0.4,5.2) -- (0.2,-0.4,5.2) -- (-0.2,-0.4,5.2) -- cycle;
+        \draw[fill=gray!10] (-0.2,0,5.2) ellipse (0.166 and 0.4);
+        \fill[fill=gray!10] (-0.2,0.4,5.2) -- (0.2,0.4,5.2) -- (0.2,-0.4,5.2) -- (-0.2,-0.4,5.2) -- cycle;
+        \draw[fill=gray!50] (0.2,0,5.2) ellipse (0.166 and 0.4);
+
+% joint 3
+        \draw (0.4,-0.2,5.2) -- (0.4,0.2,5.2) -- (-0.4,0.2,5.2) -- (-0.4,-0.2,5.2) -- cycle;
+        \draw[fill=gray!40] (0,-0.2,5.2) ellipse (0.4 and 0.266);
+        \fill[fill=gray!40] (0.4,-0.2,5.2) -- (0.4,0.2,5.2) -- (-0.4,0.2,5.2) -- (-0.4,-0.2,5.2) -- cycle;
+        \draw[fill=gray!10] (0,0.2,5.2) ellipse (0.4 and 0.266);
+        
+% Link 2
+    \draw[fill=gray!10] (O,0,5.6) circle (0.2);
+    \fill[fill=gray!10] (-0.175,0.1,5.5) -- (0.175,-0.1,5.5) -- ++(0,0,3) -- (-0.175,0.1,8.5) -- cycle;
+    \draw (-0.175,0.1,5.5) -- ++(0,0,3);
+    \draw (0.175,-0.1,5.5) -- ++(0,0,3) node[right,midway];
+
+
+        
+% end-effector
+        
+    \draw[fill=gray!130] (-0.4,-0.4,8.7) -- (-0.4,0.4,8.7) -- (0.4,0.4,8.7) -- (0.4,-0.4,8.7) -- cycle; 
+    \draw[fill=gray!170] (0.4,0.4,8.7) -- (0.4,0.4,8) -- (0.4,-0.4,8) -- (0.4,-0.4,8.7) node[right]{End-Effector} -- cycle; 
+    \draw[fill=gray!100] (0.4,0.4,8.7) -- (0.4,0.4,8) -- (-0.4,0.4,8) -- (-0.4,0.4,8.7) -- cycle;
+    
+    \draw[fill=gray!130] (-0.4,-0.4,8.7) -- (-0.4,0.4,8.7) -- (-0.1,0.4,9.1) -- (-0.1,-0.4,9.1) -- cycle;
+    \draw[fill=gray!150] (-0.1,-0.4,8.7) -- (-0.1,0.4,8.7) -- (-0.1,0.4,9.1) -- (-0.1,-0.4,9.1) -- cycle;
+    
+    \draw[fill=gray!100] (0.1,0.4,9.1) -- (0.1,0.4,8.7) -- (0.4,0.4,8.7)-- cycle;
+    \draw[fill=gray!160] (0.1,-0.4,9.1) -- (0.1,0.4,9.1) -- (0.4,0.4,8.7) -- (0.4,-0.4,8.7) -- cycle;
+    
+% Wheels   
+        \node[cylinder, aspect=1.2, draw, fill=gray!120, minimum width=30] (c) at (2,-1.2,-0.3) {};
+
+% Axes
+    \coordinate (1) at (0,0,2.1);
+        \draw[axis] (1) -- ++(0.85,0,0) node[right] {$\varpi_1$};
+        \draw[axis] (0.2,0.4,5.4) -- ++(0,0.85,0)  node[left] {$\varpi_2$};
+
+% Labels
+
+% Angles
+    
+\end{tikzpicture}
+\end{center}
+\caption{Planar Vehicle-Manipulator System}
+\label{fig:planar}
+\end{figure}
+\end{example}
+The fixed initial absolute configuration of the spacecraft joint which is the same as its center of mass is
+\begin{equation*}
+    \bar{g}^I_0=\bar{g}^I_{0,cm}=\begin{bmatrix}1 &0 &0&0 \\0 &1 &0& 0\\0 & 0& 1&h_0 \\0 & 0 & 0 & 1
+    \end{bmatrix}
+\end{equation*}
+Thus we identify the elements of the relative configuration manifold of the base rover to the inertia, which is a 3-dof planar joint motion, by
 \begin{equation}
-    g^I_{cm,i}=g^I_0e^{\hat{\xi}_{1}q_{1}}...e^{\hat{\xi}_{i}q_{i}}g^i_{cm,i}\bar{g}^0_{cm,i}
+    G^I_0=\Bigg\{\begin{bmatrix}
+    R_{Z_{3 \times 3}} & \begin{bmatrix}
+    x \\ y \\ 0
+    \end{bmatrix}\\ \begin{bmatrix}
+    0 & 0 & 0
+    \end{bmatrix} & 1
+    \end{bmatrix}\Bigg| R_Z \in \textbf{SO}(1),x,y\in\mathbb{R} \Bigg\},
+\end{equation}
+where
+\begin{equation}
+    R_Z(\theta_z)=\begin{bmatrix}
+    1 & 0 & 0\\0 &cos\theta_z & -sin\theta_z\\0 & sin\theta_z & cos\theta_z
+    \end{bmatrix}.
+\end{equation}
+The first arm link is attached to the vehicle at $^0\rho^0_1=\begin{bmatrix}0 & 0 &l_1\end{bmatrix}^T$, and its corresponding revolute joint generates rotation about $^0\varpi^0_1=\begin{bmatrix} 1 & 0 & 0\end{bmatrix}^T$, resulting in a twist of the form:
+\begin{equation*}
+    \hat{\xi}_1={}^0\hat{\xi}^0_1=\begin{bmatrix}0 &0 &0&0 \\0 &0 &-1& l_0\\0 & 1& 0&0 \\0 & 0 & 0 & 1
+    \end{bmatrix}
+\end{equation*}
+The fixed initial absolute/relative configuration of the first joint is
+\begin{equation*}
+    \bar{g}^0_1=\begin{bmatrix}1 &0 &0&0 \\0 &1 &0& l_0\\0 & 0& 1&0 \\0 & 0 & 0 & 1
+    \end{bmatrix} \quad \& \quad  \bar{g}^I_1=\begin{bmatrix}1 &0 &0&0 \\0 &1 &0& l_0\\0 & 0& 1&0 \\0 & 0 & 0 & 1
+    \end{bmatrix}
+\end{equation*}
+The resulting initial relative and absolute configurations of the center of mass of the first link are
+\begin{equation*}
+    \bar{g}^1_{1,cm}=\begin{bmatrix}1 &0 &0&0 \\0 &1 &0& \frac{l_1}{2}\\0 & 0& 1&0 \\0 & 0 & 0 & 1
+    \end{bmatrix} \quad \& \quad  \bar{g}^I_{1,cm}=\begin{bmatrix}1 &0 &0&0 \\0 &1 &0& l_0+\frac{l_1}{2}\\0 & 0& 1&0 \\0 & 0 & 0 & 1
+    \end{bmatrix}
+\end{equation*}
+The second link is attached to the first at the fixed relative linear position $^1\rho^1_2=\begin{bmatrix}0 & 0 &l_1\end{bmatrix}^T$ in the first joint's frame, which corresponds to a $ ^0\bar{\rho}^0_2=\begin{bmatrix}0 & 0 &l_0+l_1\end{bmatrix}^T$ absolute \textit{initial} position and its corresponding revolute joint generates rotation about $^0\varpi^0_2=\begin{bmatrix} 0 & 1 & 0\end{bmatrix}^T$, resulting in a twist of the form:
+\begin{equation*}
+    \hat{\xi}_2=\Ad_{\bar{g}^0_{1}}{}^{1}{\xi}^{1}_2=\begin{bmatrix}0 &0 &0&-l_0-l_1 \\0 &0 &-1& 0\\0 & 1& 0&0 \\0 & 0 & 0 & 1
+    \end{bmatrix}
+\end{equation*}
+The initial relative and absolute configurations of the second joint are
+\begin{equation*}
+    \bar{g}^1_2=\begin{bmatrix}1 &0 &0&0 \\0 &1 &0& l_1\\0 & 0& 1&0 \\0 & 0 & 0 & 1
+    \end{bmatrix} \quad \& \quad \bar{g}^I_2=\begin{bmatrix}1 &0 &0&0 \\0 &1 &0& l_0+l_1\\0 & 0& 1&0 \\0 & 0 & 0 & 1
+    \end{bmatrix}
+\end{equation*}
+The resulting initial relative and absolute configurations of the center of mass of the second link are
+\begin{equation*}
+    \bar{g}^2_{2,cm}=\begin{bmatrix}1 &0 &0&0 \\0 &1 &0& \frac{l_2}{2}\\0 & 0& 1&0 \\0 & 0 & 0 & 1
+    \end{bmatrix}\& \bar{g}^I_{2,cm}=\begin{bmatrix}1 &0 &0&0 \\0 &1 &0& l_0+l_1+\frac{l_2}{2}\\0 & 0& 1&0 \\0 & 0 & 0 & 1
+    \end{bmatrix}
+\end{equation*}
+Thus we identify the elements of the relative configuration manifold of the base spacecraft to the inertia, which is a 6-dof free joint motion, by
+\begin{equation}
+    Q^I_0=\Bigg\{g^I_0=\begin{bmatrix}
+    R_{3 \times 3} & \begin{bmatrix}
+    x \\ y \\ z
+    \end{bmatrix}\\ \begin{bmatrix}
+    0 & 0 & 0
+    \end{bmatrix} & 1
+    \end{bmatrix}\Bigg| R \in \SO,x,y,z\in\mathbb{R} \Bigg\}.
+\end{equation}
+The first manipulator joint is a 1-dof revolute joint between spacecraft and link 1, and its corresponding  constrained relative configuration manifold $Q^0_1$, identified via right translation of $G^0_1$ by $\bar{g}^0_1$, is given by
+\begin{equation}
+    Q^0_1=\Bigg\{g^0_1=
+    \resizebox{0.5\hsize}{!}{\begin{bmatrix}
+    1 & 0 & 0 & 0\\0 &\cos q_1 & -\sin q_1 & l_1\sin q_1\\0 & \sin q_1  & \cos q_1 & l_1(1-\cos q_1)\\  0 & 0 & 0 & 1
+    \end{bmatrix}}\bar{g}^0_1\Bigg| q_1 \in \mathbb{S} \Bigg\}.
+\end{equation}
+The second manipulator joint is a 1-dof revolute joint between link 1 and link 2,  and its corresponding  constrained relative configuration manifold $Q^1_2$, identified via right translation of $G^1_2$ by $\bar{g}^1_2$, is given by
+\begin{equation}
+    Q^1_2=\Bigg\{g^1_2=
+    \resizebox{0.5\hsize}{!}{\begin{bmatrix}
+    \cos q_2  & 0 & \sin q_2 & -\sin q_2(l_1+l_2)\\0 & 1& 0 & 0\\-\sin q_2 & 0 & \cos q_2 & (1-\cos q_2)(l_1+l_2)\\  0 & 0 & 0 & 1
+    \end{bmatrix}}\bar{g}^1_2\Bigg| q_2 \in \mathbb{S} \Bigg\}.
 \end{equation}
 
+\begin{example}{\textit{Spacecraft-Manipulator:}}
+In this section, the kinematic analysis of a space manipulator consisting of a 2-dof manipulator mounted on a free-floating vehicle (spacecraft) is presented. The motion of the base spacecraft is equivalent to a 6-dof free-moving joint as seen in \ref{fig:planar}. The attitude of a spacecraft is commonly described via Euler parameters or quaternions, motivated by the need to push the singularities in their representation to less occuring values. We will use a Lie group representation of the base joint instead, which enables an entirely non-singular treatment. The multi-body system consists of two other single-dof joint on top of the mentioned base joint, which represent the perpendicular manipulator joints.
+
+\begin{figure}[htbp]
+\begin{center}
+
+\begin{tikzpicture}[trimetric,scale=0.5]
+
+
+% Orbit Axes
+        \coordinate (O) at (0,0,0) node[below right]{$B$};
+        \draw[axis] (O) -- ++(1.5,0,0) node[right] {$x$};
+        \draw[axis] (O) -- ++(0,1.5,0) node[above right] {$y$};
+        \draw[axis] (O) -- ++(0,0,1.5) node[above] {$z$};
+%Base Sat
+
+        
+    \draw[fill=gray!35, fill opacity=0.5] (-2,-2,2) -- (-2,2,2) -- (2,2,2) -- (2,-2,2) -- cycle; 
+    \draw[fill=gray!70, fill opacity=0.5] (2,2,2) -- (2,2,-2) -- (2,-2,-2) -- (2,-2,2) -- cycle; 
+    \draw[fill=gray!4, fill opacity=0.5] (2,2,2) -- (2,2,-2) -- (-2,2,-2) -- (-2,2,2) -- cycle; 
+        
+% joint 1        
+        %\draw[fill=gray!50] (0,0,2) circle (0.4); 
+        \draw[fill=gray!20] (O,0,2.1) circle (0.4);
+        %\filldraw[ball color=white] (0,0,2.1) circle (0.3);
+        \draw[semithick] (0.2,0,2.1) arc (90:165.270:1);
+
+% joint 2
+        \draw (O,0,2.1) -- (0.2,0.4,5.2) -- (O.4,0,2.1) -- (O,-0.4,2.1) -- cycle;
+        \draw[fill=gray!10] (-0.2,0,5.2) ellipse (0.166 and 0.4);
+        \fill[fill=gray!10] (-0.2,0.4,5.2) -- (0.2,0.4,5.2) -- (0.2,-0.4,5.2) -- (-0.2,-0.4,5.2) -- cycle;
+        \draw[fill=gray!50] (0.2,0,5.2) ellipse (0.166 and 0.4);
+
+% Link 1
+    \draw[fill=gray!15] (O,0,2.4) circle (0.2);
+    \fill[fill=gray!15] (-0.175,0.1,2.3) -- (0.175,-0.1,2.3) -- ++(0,0,3) -- (-0.175,0.1,5.3) -- cycle;
+    \draw (-0.175,0.1,2.3) -- ++(0,0,3);
+    \draw (0.175,-0.1,2.3) -- ++(0,0,3) node[right,midway];
+
+
+   
+% joint 3
+        \draw (0.4,-0.2,5.2) -- (0.4,0.2,5.2) -- (-0.4,0.2,5.2) -- (-0.4,-0.2,5.2) -- cycle;
+        \draw[fill=gray!40] (0,-0.2,5.2) ellipse (0.4 and 0.266);
+        \fill[fill=gray!40] (0.4,-0.2,5.2) -- (0.4,0.2,5.2) -- (-0.4,0.2,5.2) -- (-0.4,-0.2,5.2) -- cycle;
+        \draw[fill=gray!10] (0,0.2,5.2) ellipse (0.4 and 0.266);
+        
+% Link 2
+    \draw[fill=gray!10] (O,0,5.6) circle (0.2);
+    \fill[fill=gray!10] (-0.175,0.1,5.5) -- (0.175,-0.1,5.5) -- ++(0,0,3) -- (-0.175,0.1,8.5) -- cycle;
+    \draw (-0.175,0.1,5.5) -- ++(0,0,3);
+    \draw (0.175,-0.1,5.5) -- ++(0,0,3) node[right,midway];
+
+
+
+
+% end-effector
+        
+    \draw[fill=gray!130] (-0.4,-0.4,8.7) -- (-0.4,0.4,8.7) -- (0.4,0.4,8.7) -- (0.4,-0.4,8.7) -- cycle; 
+    \draw[fill=gray!170] (0.4,0.4,8.7) -- (0.4,0.4,8) -- (0.4,-0.4,8) -- (0.4,-0.4,8.7) node[below right]{End-Effector} -- cycle; 
+    \draw[fill=gray!100] (0.4,0.4,8.7) -- (0.4,0.4,8) -- (-0.4,0.4,8) -- (-0.4,0.4,8.7) -- cycle;
+    
+    \draw[fill=gray!130] (-0.4,-0.4,8.7) -- (-0.4,0.4,8.7) -- (-0.1,0.4,9.1) -- (-0.1,-0.4,9.1) -- cycle;
+    \draw[fill=gray!150] (-0.1,-0.4,8.7) -- (-0.1,0.4,8.7) -- (-0.1,0.4,9.1) -- (-0.1,-0.4,9.1) -- cycle;
+    
+    \draw[fill=gray!100] (0.1,0.4,9.1) -- (0.1,0.4,8.7) -- (0.4,0.4,8.7)-- cycle;
+    \draw[fill=gray!160] (0.1,-0.4,9.1) -- (0.1,0.4,9.1) -- (0.4,0.4,8.7) -- (0.4,-0.4,8.7) -- cycle;
+
+% Axes
+    \coordinate (1) at (0,0,2.1);
+        \draw[axis] (1) -- ++(0.85,0,0) node[right] {$\varpi_1$};
+        \draw[axis] (0.2,0.4,5.4) -- ++(0,0.85,0)  node[left] {$\varpi_2$};
+
+% Labels
+
+% Angles
+    
+\end{tikzpicture}
+\end{center}
+\caption{Satellite Manipulator System}
+\label{fig:my_label}
+\end{figure}
+The fixed initial absolute configuration of the spacecraft joint which is the same as its center of mass is
+\begin{equation*}
+    \bar{g}^I_0=\bar{g}^I_{0,cm}=\begin{bmatrix}1 &0 &0&0 \\0 &1 &0& 0\\0 & 0& 1&0 \\0 & 0 & 0 & 1
+    \end{bmatrix}
+\end{equation*}
+
+The first arm link is attached to the spacecraft at $^0\rho^0_1=\begin{bmatrix}0 & 0 &l_1\end{bmatrix}^T$, and its corresponding revolute joint generates rotation about $^0\varpi^0_1=\begin{bmatrix} 1 & 0 & 0\end{bmatrix}^T$, resulting in a twist of the form:
+\begin{equation*}
+    \hat{\xi}_1={}^0\hat{\xi}^0_1=\begin{bmatrix}0 &0 &0&0 \\0 &0 &-1& l_0\\0 & 1& 0&0 \\0 & 0 & 0 & 1
+    \end{bmatrix}
+\end{equation*}
+The fixed initial absolute/relative configuration of the first joint is
+\begin{equation*}
+    \bar{g}^0_1=\begin{bmatrix}1 &0 &0&0 \\0 &1 &0& 0\\0 & 0& 1& l_0 \\0 & 0 & 0 & 1
+    \end{bmatrix} \quad \& \quad  \bar{g}^I_1=\begin{bmatrix}1 &0 &0&0 \\0 &1 &0& 0\\0 & 0& 1&l_0 \\0 & 0 & 0 & 1
+    \end{bmatrix}
+\end{equation*}
+The resulting initial relative and absolute configurations of the center of mass of the first link are
+\begin{equation*}
+    \bar{g}^1_{1,cm}=\begin{bmatrix}1 &0 &0&0 \\0 &1 &0& \frac{l_1}{2}\\0 & 0& 1&0 \\0 & 0 & 0 & 1
+    \end{bmatrix} \quad \& \quad  \bar{g}^I_{1,cm}=\begin{bmatrix}1 &0 &0&0 \\0 &1 &0& l_0+\frac{l_1}{2}\\0 & 0& 1&0 \\0 & 0 & 0 & 1
+    \end{bmatrix}
+\end{equation*}
+The second link is attached to the first at the fixed relative linear position $^1\rho^1_2=\begin{bmatrix}0 & 0 &l_1\end{bmatrix}^T$ in the first joint's frame, which corresponds to a $ ^0\bar{\rho}^0_2=\begin{bmatrix}0 & 0 &l_0+l_1\end{bmatrix}^T$ absolute \textit{initial} position and its corresponding revolute joint generates rotation about $^0\varpi^0_2=\begin{bmatrix} 0 & 1 & 0\end{bmatrix}^T$, resulting in a twist of the form:
+\begin{equation*}
+    \hat{\xi}_2=\Ad_{\bar{g}^0_{1}}{}^{1}{\xi}^{1}_2=\begin{bmatrix}0 &0 &1&-l_0-l_1 \\0 &0 &0& 0\\-1 & 0& 0&0 \\0 & 0 & 0 & 1
+    \end{bmatrix}
+\end{equation*}
+The initial relative and absolute configurations of the second joint are
+\begin{equation*}
+    \bar{g}^1_2=\begin{bmatrix}1 &0 &0&0 \\0 &1 &0& 0\\0 & 0& 1&l_1 \\0 & 0 & 0 & 1
+    \end{bmatrix} \quad \& \quad \bar{g}^I_2=\begin{bmatrix}1 &0 &0&0 \\0 &1 &0& 0\\0 & 0& 1&l_0+l_1 \\0 & 0 & 0 & 1
+    \end{bmatrix}
+\end{equation*}
+The resulting initial relative and absolute configurations of the center of mass of the second link are
+\begin{equation*}
+    \bar{g}^2_{2,cm}=\begin{bmatrix}1 &0 &0&0 \\0 &1 &0& 0\\0 & 0& 1&\frac{l_2}{2} \\0 & 0 & 0 & 1
+    \end{bmatrix}\& \bar{g}^I_{2,cm}=\begin{bmatrix}1 &0 &0&0 \\0 &1 &0& 0\\0 & 0& 1&l_0+l_1+\frac{l_2}{2} \\0 & 0 & 0 & 1
+    \end{bmatrix}
+\end{equation*}
+Thus we identify the elements of the relative configuration manifold of the base spacecraft to the inertia, which is a 6-dof free joint motion, by
+\begin{equation}
+    Q^I_0=\Bigg\{g^I_0=\begin{bmatrix}
+    R_{3 \times 3} & \begin{bmatrix}
+    x \\ y \\ z
+    \end{bmatrix}\\ \begin{bmatrix}
+    0 & 0 & 0
+    \end{bmatrix} & 1
+    \end{bmatrix}\Bigg| R \in \SO,x,y,z\in\mathbb{R} \Bigg\}.
+\end{equation}
+The first manipulator joint is a 1-dof revolute joint between spacecraft and link 1, and its corresponding  constrained relative configuration manifold $Q^0_1$, identified via right translation of $G^0_1$ by $\bar{g}^0_1$, is given by
+\begin{equation}
+    Q^0_1=\Bigg\{g^0_1=
+    \resizebox{0.5\hsize}{!}{\begin{bmatrix}
+    1 & 0 & 0 & 0\\0 &\cos q_1 & -\sin q_1 & l_0\sin q_1\\0 & \sin q_1  & \cos q_1 & l_0(1-\cos q_1)\\  0 & 0 & 0 & 1
+    \end{bmatrix}}\bar{g}^0_1\Bigg| q_1 \in \mathbb{S} \Bigg\}.
+\end{equation}
+The second manipulator joint is a 1-dof revolute joint between link 1 and link 2,  and its corresponding  constrained relative configuration manifold $Q^1_2$, identified via right translation of $G^1_2$ by $\bar{g}^1_2$, is given by
+\begin{equation}
+    Q^1_2=\Bigg\{g^1_2=
+    \resizebox{0.5\hsize}{!}{\begin{bmatrix}
+    \cos q_2  & 0 & \sin q_2 & -\sin q_2(l_0+l_1)\\0 & 1& 0 & 0\\-\sin q_2 & 0 & \cos q_2 & (1-\cos q_2)(l_0+l_1)\\  0 & 0 & 0 & 1
+    \end{bmatrix}}\bar{g}^1_2\Bigg| q_2 \in \mathbb{S} \Bigg\}.
+\end{equation}
+\end{example}
 
 \subsubsection{Differential Kinematics} \label{diffkin}
+In this section, we formulate the absolute velocity of rigid bodies in a multi-body system expressed in the inertial or body frame, based on $({}^0\mathcal{V}^I_0,\dot{q}_\mathfrak{m})\in(\q_0^0)^\vee\times TQ_{\mathfrak{m}}$ using appropriate Jacobian mappings. Here, $\q_0^0 \subseteq \g_0^0$ is the Lie sub-algebra of $Q_0^0:=(\bar{g}^I_0)^{-1}Q^I_0\subseteq G^0_0$ corresponding to $Q_0^I$ with the inclusion map $\iota_0: (\q^0_0)^\vee \rightarrow (\g^0_0)^\vee$. %to the the base vehicle's constrained velocity and the time-derivatives of the manipulator's generalized coordinates, the parametrization of the tangent space? 
+
 \begin{lemma}
-In matrix form the velocity of Body $i$ relative to the inertial frame can be represented in the frame of inertia or Body $i$ as
+In matrix form the velocity of Body $i$ relative to the inertial frame can be represented in the inertial or Body $i$ coordinate frame as
 \begin{equation}
-{}^IV_i^I(q)= {}^IJ^I_i\begin{bmatrix}^0V^I_0\\\dot{q}_\mathfrak{m}\end{bmatrix} \quad \& \quad ^iV_i^I(q)={}^iJ^I_i\begin{bmatrix}^0V^I_0\\\dot{q}_\mathfrak{m}\end{bmatrix}. \label{bodyvelocity}
+{}^IV_i^I= {}^IJ^I_i\begin{bmatrix}^0\mathcal{V}^I_0\\\dot{q}_\mathfrak{m}\end{bmatrix} \quad \& \quad ^iV_i^I={}^iJ^I_i\begin{bmatrix}^0\mathcal{V}^I_0\\\dot{q}_\mathfrak{m}\end{bmatrix}, \label{bodyvelocity}
 \end{equation}
-where the inertial and body jacobian matrices are
+where the inertial and body Jacobian matrices are
 \begin{equation}
-    ^IJ^I_i(q)=\Ad_{g^I_0} {}^0J^I_i \quad \& \quad {}^iJ^I_i(q)=\Ad_{(g^0_i)^{-1}}{}{}^0J^I_i,
-    \label{bodyjacobian}
+    ^IJ^I_i(g^I_0,q_\m)=\Ad_{g^I_0} {}^0J^I_i \quad \& \quad {}^iJ^I_i(q_\m)=\Ad_{(g^0_i)^{-1}}{}{}^0J^I_i,
+    \label{bodyJacobian}
 \end{equation}
-and the base jacobian matrix is
+and the base Jacobian matrix is
 \begin{equation}
-    ^0J^I_i(q)=\begin{bmatrix} I  & \hat{\xi}_{1}\cdots \Ad_{e^{\hat{\xi}_{1}q_{1}}\cdots e^{\hat{\xi}_{i-1}q_{i-1}}}\hat{\xi}_i & 0\cdots 0\end{bmatrix},
-    \label{basejacobian}
+    ^0J^I_i(q_\m)=\begin{bmatrix} \iota_0  & {\xi}_{1}\cdots \Ad_{e^{\hat{\xi}_{1}q_{1}}\cdots e^{\hat{\xi}_{i-1}q_{i-1}}}{\xi}_i & 0\cdots 0\end{bmatrix},
+    \label{baseJacobian}
 \end{equation}
-where the twist $\hat{\xi}_i$ has been rigorously defined by \eqref{twist}.
+where the twist ${\xi}_i$ has been defined by \eqref{twist}.
 \end{lemma}
-\begin{proof}[Proof ] In an open-chain multi-body system, there exists a unique path between the inertial frame and each body in the chain. The velocity of each Body $i$ in the multi-body system relative to the inertial frame is found by adding up all the relative velocities of neighbouring bodies in that path starting from the base's velocity relative to the inertial frame all the way up to the velocity of Body $i$ relative to Body $i-1$:
+\begin{proof}[Proof ] In an open-chain multi-body system, there exists a unique path between the inertial frame and each body in the chain. The velocity of Body $i$ in the multi-body system relative to the inertial frame is found by adding up all the relative velocities of neighbouring bodies:
 \begin{equation}
     ^IV^I_i={}^IV_{0}^I+{}^IV_{1}^{0}+\cdots+{}^IV_{i}^{i-1}, \label{eqinertialvel}
 \end{equation}
-where all the individual relative velocities must belong to a common Lie algebra $g^I_I$.
-The formulation of rigid Body velocity as presented in Section \ref{difkinrigid} \eqref{relvel} provides the velocity of each Body $j$ in a multi-body chain with respect to its neighbour Body $j-1$, represented in either the neighbor body frame $j-1$ or the body frame $j$. In order to add several velocities $^{j-1}V^{j-1}_j$ which individually belong to $\g^I_I$, $\g^b_b$, ... and $\g^{i-1}_{i-1}$, we should map all of these velocities to one common frame $I$.
-It can be seen from \ref{difkinrigid} \eqref{adjoint} that $\forall i\in\{b,1,\cdots,n\}$ the velocity of each Body $i$ in the space manipulator relative to its neighbouring Body $i-1$ expressed in the inertial frame is calculated from 
+where all the individual relative velocities must belong to a common Lie algebra $(\g^I_I)^\vee$.
+%The formulation of the rigid Body velocity as presented in \eqref{relvel} provides the velocity of Body $j$ in a multi-body chain with respect to its neighbour Body $j-1$, represented in either the neighbor body frame $j-1$ or the body frame $j$. 
+The relative velocity of Body $i$ with respect to its neighboring Body $i-1$ for all $i \in \{0,1,\cdots,n\}$ and expressed in the inertial frame is
 \begin{equation}
-    {}^{I}V_i^{i-1}=\Ad_{g^{I}_0 g_{i-1}^0}{}^{i-1}V_i^{i-1}.
+    {}^{I}V_i^{i-1}=\Ad_{g^{I}_0 g_{i-1}^0}{}^{i-1}V_i^{i-1},
+    \label{bodyivelinert}
 \end{equation}
-Using this property, the inertial velocity in \eqref{eqinertialvel} can be reformed as
-\begin{equation}
+where the relative velocity ${}^{i-1}\hat{V}_i^{i-1} \in \g^{i-1}_{i-1}$ corresponding to Joint $i$ can be obtained from \eqref{relvel}.
+%In order to add several velocities $^{j-1}V^{j-1}_j$ which individually belong to $\g^I_I$, $\g^0_0$, ... and $\g^{i-1}_{i-1}$, we should map all of these velocities to one common frame $I$.
+%It can be seen from \eqref{veladj} that $\forall i\in\{b,1,\cdots,n\}$ the velocity of each Body $i$ in the space manipulator relative to its neighbouring Body $i-1$ expressed in the inertial frame is calculated from 
+Substituting \eqref{bodyivelinert} in \eqref{eqinertialvel}, we have
+\begin{equation*}
     {}^IV^I_i={}^IV_{0}^I+\Ad_{g^I_0}{}^0V_{1}^{0}+\Ad_{g^I_0g^0_1}{}^1V_{2}^{1}+\\
-    \cdots+\Ad_{g^I_0g^0_{i-1}}{}^{i-1}V_{i}^{i-1}
+    \cdots+\Ad_{g^I_0g^0_{i-1}}{}^{i-1}V_{i}^{i-1}. \label{eq23}
+\end{equation*}
+Considering the fact that a vehicle-manipulator's planning and control system often works within the frame of the base vehicle, we express the contributions of the manipulator and the base vehicle in the velocity of Body $i$ the vehicle's coordinate frame:
+\begin{equation}
+    ^IV_i^{I}=\Ad_{g^I_0}({}^0{V}^I_0+{}^0V^0_i).\label{velocitytemp}
 \end{equation}
+The relative configurations corresponding to the joints in the manipulator chain are parameterized using \eqref{expparam}:
+\begin{align} 
+\begin{split}
+{}^0V^0_i=&{}^0V_{1}^{0}+\Ad_{e^{\hat{\xi}_1q_1}}\big(\Ad_{\bar{g}^0_1}{}^1V_{2}^{1}\big)+\\
+    &\cdots+\Ad_{e^{\hat{\xi}_1q_1}\cdots e^{\hat{\xi}_{i-1}q_{i-1}}}\big(\Ad_{\bar{g}^0_{i-1}}{}^{i-1}V_{i}^{i-1}\big)\\
+    =&\xi_1\dot{q}_1+\cdots+\Ad_{e^{\hat{\xi}_{1}q_{1}}\cdots e^{\hat{\xi}_{i-1}q_{i-1}}}\xi_i\dot{q}_i. \label{basevelocity}
+    \end{split}
+\end{align}
 The base's velocity can be identified via a left translation by $g^I_0$ to the Lie algebra of the base
 \begin{equation}
     ^0\hat{V}_0^I=({g_0^I})^{-1}\dot{g}_0^I \in \g^0_0.
 \end{equation}
-If the base vehicle is modeled as 6-dof rigid body, its velocity, belonging to $\g^0_0$, is parameterized by angular velocity $^0\omega^I_0$ and linear velocity $^0v^I_0$:
+As $Q^I_0=\bar{g}^I_0Q^0_0$, each element $g^I_0$ and its derivative can be identified by $g^I_0=\bar{g}^I_0g^0_0$ and $\dot{g}^I_0=\bar{g}^I_0\dot{g}^0_0$ for a unique $g_0^0\in Q_0^0$, which provides
 \begin{equation}
-    ^0\hat{V}_0^I=\begin{bmatrix}{}^0\tilde{\omega}_0^I&^0v^I_0\\0 & 0\end{bmatrix} \in \g^0_0
+    ^0{V}_0^I=\big(({g_0^0})^{-1}\dot{g}_0^0\big)^\vee \in \iota_0(\q^0_0)^\vee \subseteq (\g^0_0)^\vee.
 \end{equation}
-It is worth noting that quasi-velocities are used to parameterize the velocity space Lie algebra $\g^0_0$ of the vehicle, meaning that these velocities are not direct derivatives of the quantities that describe the configuration spaces (not parameterized in this study). 
+Given the element ${}^0\hat{\mathcal{V}}^I_0\in \q^0_0$ corresponding to the base velocity, we have
+\begin{equation}
+    ^0{V}_0^I=\iota_0{}^0\mathcal{V}^I_0.
+    \label{inclusionmapvelocity}
+\end{equation} 
+Substituting \eqref{inclusionmapvelocity} and \eqref{basevelocity} into \eqref{velocitytemp}, we find
+\begin{equation}
+^IV_i^{I}(g^I_0,{}^0\mathcal{V}^I_0,q_\m,\dot{q}_\m)=\Ad_{g^I_0}(\iota_0{}^0\mathcal{V}^I_0+{}^0V^0_i(q_\m,\dot{q}_\m)).
+\end{equation}
+%If the base vehicle is modeled as 6-dof rigid body, its velocity, belonging to $\g^0_0$, is parameterized by angular velocity $^0\omega^I_0$ and linear velocity $^0v^I_0$:
+%\begin{equation}
+%    ^0\hat{V}_0^I=\begin{bmatrix}{}^0\tilde{\omega}_0^I&^0v^I_0\\0 & 0\end{bmatrix} \in \g^0_0
+%\end{equation}
 \begin{comment}
+It is worth noting that ${}0V^I_0$ are quasi-velocities are the velocity space Lie algebra $\g^0_0$ of the vehicle, meaning that these velocities are not direct derivatives of the quantities that describe the configuration spaces (not parameterized in this study). 
 This means
 \begin{equation}
 ^ bV_b^ o=\begin{bmatrix}^bv^o_b\\\omega^ o_b\end{bmatrix}=\begin{bmatrix} -\dot{R}^ o_bR^b_ o{p}^ o_b+\dot{p}^ o_b\\(\dot{R}^ o_b{R}^b_ o)^\vee\end{bmatrix},
@@ -378,39 +735,106 @@ and in orbital frames
 \end{equation}
 
 \end{comment}
-Next, the configuration of each body in the manipulator chain $g^{i-1}_i$ has been parameterized by screw joint parameters:
-\begin{multline} {}^IV^I_i={}^IV_0^I+\Ad_{g^I_0}{}^0V_{1}^{0}+\Ad_{g^I_0e^{\hat{\xi}_1q_1}}\big(\Ad_{\bar{g}^0_1}{}^1V_{2}^{1}\big)+\\
-    \cdots+\Ad_{g^I0e^{\hat{\xi}_1q_1}\cdots e^{\hat{\xi}_{i-1}q_{i-1}}}\big(\underbrace{\Ad_{\bar{g}^0_{i-1}}{}^{i-1}V_{i}^{i-1}}_\text{twist definition root}\big).
-\end{multline}
-Thus, the velocity of Body $i$ in the chain with respect to the inertial frame represented in the inertial frame can be simplified to:
-\begin{equation}
-    {}^IV_i^I(q)={}^IV_0^ I+\Ad_{g^{I}_0}{}\xi_1\dot{q}_1+\cdots+\Ad_{g^{I}_0e^{\hat{\xi}_{1}q_{1}}\cdots e^{\hat{\xi}_{i-1}q_{i-1}}}\xi_i\dot{q}_i.
-\end{equation}
-Considering the fact that a space manipulator's planning and control system works within the frame of the base vehicle, the space manipulator's contribution to the velocity of Body $i$ relative to the inertial frame is represented in the frame of the base vehicle:
-\begin{equation}
-    ^IV_i^{I    }(q)={}^IV^I_0(t)+\Ad_{g^I_0}{}^0V^I_i(q),
-\end{equation}
-where
-\begin{equation}
-    ^0V^I_i=\xi_1\dot{q}_1+\cdots+\Ad_{e^{\xi_{1}q_{1}}\cdots e^{\xi_{i-1}q_{i-1}}}\xi_i\dot{q}_i,
-\end{equation}
-providing the motivation for the definition of jacobian in Equations \ref{bodyjacobian} and \ref{basejacobian}, and derivation of \eqref{bodyvelocity}.
+%Noticing that the twist from \eqref{twist} is showing up here, we can substitute that to get:
+By appropriately defining $^0J_i^I$ as \eqref{baseJacobian} we arrive at the equations in the statement of the lemma.
+%This provides the motivation for the definition of base Jacobian in \eqref{baseJacobian} from the matrix relation
+%\begin{equation*}
+%    ^0V^I_i=\begin{bmatrix} \iota_0  & \hat{\xi}_{1}\cdots \Ad_{e^{\hat{\xi}_{1}q_{1}}\cdots e^{\hat{\xi}_{i-1}q_{i-1}}}\hat{\xi}_i & 0\cdots 0\end{bmatrix}\begin{bmatrix}^0\mathcal{V}^I_0\\ \dot{q}_\m\end{bmatrix},
+%\end{equation*}
+%and the derivation of inertial and body Jacobians derivation of \eqref{bodyvelocity}.
 \end{proof}
-Since these velocities will be paired with body inertia matrices in calculating the kinetic energy, we have represened the velocity of each body relative to the inertial frame in the body coordinate frame too. %Therefore, the body Jacobian is presented:
+Since these velocities will be paired with body inertia matrices in calculating the kinetic energy, we have represented the absolute velocity of each body in both the inertial and body coordinate frames. %Therefore, the body Jacobian is presented:
 % as a result we can say
 % \begin{multline}
 %     {}^iJ^o_i(q)=Ad_{(g^b_i)^{-1}}{}\begin{bmatrix} I_{6\times 6}  & \xi_{1}\cdots Ad_{e^{\xi_{1}q_{1}}\cdots e^{\xi_{i-1}q_{i-1}}}\xi_i & 0\cdots 0\end{bmatrix}\\
 %     =\begin{bmatrix}Ad_{g^b_i(0)^{-1}e^{-\xi_{i}q_{i}}\cdots e^{-\xi_1q_1}}I_{6 \times 6} & Ad_{g^b_i(0)^{-1}e^{-\xi_{i}q_{i}}\cdots e^{-\xi_1q_1}}\xi_{1}& \cdots &Ad_{ g^b_i(0)^{-1}e^{-\xi_iq_i}}\xi_i & 0& \cdots& 0\end{bmatrix} 
-%     \label{bodyjacobian}
+%     \label{bodyJacobian}
 % \end{multline}
-It is worth pointing out here the fact that the body velocity $^iV^I_i$ turned out to be completely independant of $\Ad_{g^I_0}$, which translates to the dynamics of the system being symmetric with respect to the configuration of the base body. This means that the dynamics of the system has the same shape and characteristics any configuration of the base vehicle. 
+The body velocity $^iV^I_i$ is independent of ${g^I_0}$; and hence, the kinetic energy of the system will be symmetric with respect to the action of the Lie group associated with the configuration of the base vehicle. %This means that the dynamics of the vehicle-manipulator system has the same shape and characteristics at any configuration of the base vehicle. 
 
 %\subsection{Case Study?}
 
+\begin{example}{ \textit{Planar Vehicle:}}
+The inclusion map of the base velocity as a Lie subgroup of $\SE$ is
+\begin{equation*}
+    \iota_0=\begin{bmatrix}
+    1 & 0 & 0\\
+    0 & 1 & 0\\
+    0 & 0 & 0\\
+    0 & 0 & 0\\
+    0 & 0 & 0\\
+    0 & 0 & 1
+    \end{bmatrix}.
+\end{equation*}
+\end{example}
+\begin{example}{ \textit{Spacecraft Manipulator:}}
+The inclusion map of the spacecraft velocity as a Lie subgroup of $\SE$ is
+\begin{equation*}
+    \iota_0=\mathbb{I}_{6 \times 6}.
+\end{equation*}
+It is essential to find the spatial and body velocities of each body in the system, which in turn, requires the calculation of spatial and body Jacobians of each of the bodies:
+
+\begin{strip}
+\begin{equation*}
+    ^0J^I_0=\begin{bmatrix}
+    1 & 0 & 0 & 0 & 0 & 0& 0 & 0\\
+    0 & 1 & 0 & 0 & 0 & 0& 0 & 0\\
+    0 & 0 & 1 & 0 & 0 & 0& 0 & 0\\
+    0 & 0 & 0 & 1 & 0 & 0& 0 & 0\\
+    0 & 0 & 0 & 0 & 1 & 0& 0 & 0\\
+    0 & 0 & 0 & 0 & 0 & 1& 0 & 0
+    \end{bmatrix} \quad \& \quad ^0J^I_1=\begin{bmatrix}
+    1 & 0 & 0 & 0 & 0 & 0& 0 & 0\\
+    0 & 1 & 0 & 0 & 0 & 0& 0 & 0\\
+    0 & 0 & 1 & 0 & 0 & 0& 1 & 0\\
+    0 & 0 & 0 & 1 & 0 & 0& 0 & 0\\
+    0 & 0 & 0 & 0 & 1 & 0& l_0 & 0\\
+    0 & 0 & 0 & 0 & 0 & 1& 0 & 0
+    \end{bmatrix}
+\end{equation*}
+
+\begin{equation*}
+    ^0J^I_2=\begin{bmatrix}
+    1 & 0 & 0 & 0 & 0 & 0& 0 & 0\\
+    0 & 1 & 0 & 0 & 0 & 0& 0 & \cos q_1 -(1-\cos q_1)(l_0+l_1)l_0\\
+    0 & 0 & 1 & 0 & 0 & 0& 1 & \sin q_1 -\sin q_1(l_0+l_1)l_0\\
+    0 & 0 & 0 & 1 & 0 & 0& 0 & -(l_0+l_1)\\
+    0 & 0 & 0 & 0 & 1 & 0& l_0 & 0\\
+    0 & 0 & 0 & 0 & 0 & 1& 0 & 0
+    \end{bmatrix}
+\end{equation*}
+
+and
+
+\begin{equation*}
+    ^IJ^I_0=\begin{bmatrix}
+    R_0^I & \begin{bmatrix}
+    0 & -z & y\\z & 0 & -x\\-y & x & 0\end{bmatrix} R_0^ I & \mathbb{O}_{3 \times 2}\\0& R_0^I & \mathbb{O}_{3 \times 2}
+    \end{bmatrix}
+\end{equation*}
+
+\begin{equation*}
+    ^IJ^I_1=\begin{bmatrix}
+    R_0^I & \begin{bmatrix}
+    0 & -z & y\\z & 0 & -x\\-y & x & 0\end{bmatrix} R_0^ I & R_0^ I \begin{bmatrix} 0 \\ 0 \\ 1\end{bmatrix} +\begin{bmatrix}
+    0 & -z & y\\z & 0 & -x\\-y & x & 0\end{bmatrix} R_0^I \begin{bmatrix} 0 \\ l_0 \\ 0\end{bmatrix} & \mathbb{O}_{3 \times 1}\\0& R_0^I & R_0^ I \begin{bmatrix} 0 \\ l_0 \\ 0\end{bmatrix} & \mathbb{O}_{3 \times 1}
+    \end{bmatrix}
+\end{equation*}
+
+\begin{equation*}
+    ^IJ^I_2=\begin{bmatrix}
+    R_0^I & \begin{bmatrix}
+    0 & -z & y\\z & 0 & -x\\-y & x & 0\end{bmatrix} R_0^ I & R_0^ I \begin{bmatrix} 0 \\ 0 \\ 1\end{bmatrix} +\begin{bmatrix}
+    0 & -z & y\\z & 0 & -x\\-y & x & 0\end{bmatrix} R_0^I \begin{bmatrix} 0 \\ l_0 \\ 0\end{bmatrix}& R_0^ I \begin{bmatrix} 0\\\cos q_1 -(1-\cos q_1)(l_0+l_1)l_0\\\sin q_1 -\sin q_1(l_0+l_1)l_0\end{bmatrix} +\begin{bmatrix}
+    0 & -z & y\\z & 0 & -x\\-y & x & 0\end{bmatrix} R_0^I \begin{bmatrix} -(l_0+l_1) \\ 0 \\ 0\end{bmatrix}\\0& R_0^I & R_0^ I \begin{bmatrix} 0 \\ l_0 \\ 0\end{bmatrix} & R_0^ I \begin{bmatrix} -(l_0+l_1) \\ 0 \\ 0\end{bmatrix}
+    \end{bmatrix}
+\end{equation*}
+It is worth mentioning that the adjoint properties from Appendix \ref{appendix:adjoints} have been utilized.
+\end{strip}
+%\left[\begin{array}{ c c | c c}
+\end{example}
+
 \begin{comment}
-
-
-
 \begin{figure}[htbp]
 \begin{center}
 \begin{tikzpicture}[x=1cm, y=1cm, z=-0.6cm, scale=0.7]
@@ -552,47 +976,325 @@ exponential coordinate mapping of the group, i.e., the mapping. with bi the appr
 
 \section{Vehicle-Manipulator System Dynamics}
 \label{chap:Dynamics}
-The moving-base multi-body robot's dynamics include the coupled motion of the robotic arm and the base vehicle. The Euler-Poincare formula can provide the dynamics of a decoupled rigid base intrinsically independent of the system configuration's parametrization. Euler-Poincaré equations can be viewed as the reduction of the Euler-Lagrange equations from the tangent bundle of a Lie group to its Lie algebra. In this section, we present an intrinsic (coordinate-free and therefore, singularity-free) and geometric way of writing the reduced dynamic equations on a cartesian product of a Lie Group (moving base) and a shape space (manipulator), called the Lagrange–Poincare equations. The reduced equations are a combination of standard Euler-Lagrange equations for the parametrized portion of the configuration space (arm motion) $T Q/Q^I_0=TQ_\mathfrak{m}$ and Euler-Poincaré equations for the Lie group portion (base) $Q^I_0$. This allows for a nice decomposition between the singularity-free dynamics of the base and the manipulator dynamics. Any disturbance that can be further added is also easily decoupled between the two in this formulation. %(?? A key point in doing this is to decompose the variations of curves in $Q$ into vertical and horizontal components.)
-%\section{Lagrange-Poincare Formulation of Multi-Body System Dynamics}
-%Dynamics Formulation on a Cartesian Product of a Lie Group and a Shape Space?
+%The moving-base multi-body robot's dynamics include the coupled motion of the robotic arm and the base vehicle. The Euler-poincar\'{e} formula can provide the dynamics of a decoupled rigid base intrinsically independent of the system configuration's parametrization. Euler-Poincaré equations can be viewed as the reduction of the Euler-Lagrange equations from the tangent bundle of a Lie group to its Lie algebra. 
+In this section, we present an intrinsic formulation (coordinate-free and therefore, singularity-free) for the dynamics of the systems evolving on a cartesian product of a Lie Group (moving base) and a smooth manifold (manipulator), called the Lagrange–Poincar\'{e} equations. In the derivation of the equations we use the principal bundle structure of the configuration manifold. The equations are a combination of standard Euler-Lagrange equations for the shape space (arm motion) $Q/Q^0_0 \cong Q_\mathfrak{m}$ and Euler-Poincar\'{e} equations for the Lie group (base motion) $Q^0_0$. This introduces a decomposition of the equations of motion into the singularity-free dynamics of the base and the manipulator dynamics. The decomposition also allows for studying the effects of internal and external forces and their couplings in an elucidated fashion. % can be added to this formulation, considering the coupling between the two sets of equations. %(?? A key point in doing this is to decompose the variations of curves in $Q$ into vertical and horizontal components.)
+%\section{Lagrange-poincar\'{e} Formulation of Multi-Body System Dynamics}
+%Dynamics Formulation on a Cartesian Product of a Lie Group and a Shape Space? Intrinsic quantities are those that can be expressed exclusively in terms of distances along the surface, whereas extrinsic quantities are those that must be defined using surface normal vectors and/or an embedding into space.
 
-\begin{theorem} Given a moving-base multi-body system with base configuration $g^I_0$, arm coordinates $q_\mathfrak{m}$, body velocities ${}^iV^I_i$, arm input $F_\mathfrak{m}$ and total input $F_\Omega$, individual body masses ${}^i\mathcal{M}_i$, overall angular momentum $P$, and kinetic energy $K=\sum \frac{1}{2} {{}^iV_i^I}^T(^i\mathcal{M}_i){}^iV_i^I$, the decoupled external and internal dynamics can be written as
+The dynamics of the vehicle-manipulator system can be derived through the Lagrange-D'Alembert principle%$\delta \int \mathcal{L}dt- \delta \int (F_{e}\delta q) dt=0$ 
+, based on the applied forces to the system and the $\mathcal{L}$agrangian $\mathcal{L}\colon TQ \rightarrow \mathbb{R}$ defined as: %The $\mathcal{L}$agrangian $\mathcal{L}$ of the system is the kinetic minus the potential energy %the external forces on the system, 
+\begin{equation}
+    \mathcal{L}=K-U,
+    \label{lagrangianfirst}
+\end{equation}
+where $K\colon TQ\rightarrow \mathbb{R}$ is the total kinetic energy, and $U\colon Q\rightarrow\mathbb{R}$ is the potential energy.
+\begin{lemma}
+For a symmetric potential energy under the action of $Q^0_0$, the $\mathcal{L}$agrangian of a vehicle-manipulator system on $TQ$ drops to a reduced $\L$agrangian $\ell^0\colon\q^0_0 \times TQ_\m\rightarrow \mathbb{R}$:
 \begin{align}
-    -\dot{P}+\textbf{ad}^*_{^0V^I_0}P=F_{\Omega}
+\begin{split}
+    \ell^0=\frac{1}{2}\begin{bmatrix}^0\V^I_0 \\ \dot{q}_\mathfrak{m}\end{bmatrix}^T M(q_\mathfrak{m}) \begin{bmatrix}^0\V^I_0\\\dot{q}_\mathfrak{m}\end{bmatrix}-u,
+\end{split}
+\label{lagrangianbig}
+\end{align}
+where $M(q_{\m})\colon (\q^0_0 \times T_{q_\m}Q_\m)\times (\q^0_0 \times T_{q_\m}Q_\m)\rightarrow \mathbb{R}$ is the reduced mass metric, given in \eqref{totalM}, and $u:=U(e_0,q_{\m})\colon Q_\m\rightarrow \mathbb{R}$ is the reduced potential energy. Here, $e_0 \in Q^0_0$ is the identity element.
+\end{lemma} 
+\begin{proof}[Proof] %The potential energy of the system with respect to the inertia frame is found by summing kinetic energies of all individual bodies in the chain:
+%\begin{equation}
+%    U(g^I_0,q_\m)=\sum {}m_i\textbf{z}_I.p^I_i
+%\end{equation}
+%This potential is $R^I_0$-invariant.
+The kinetic energy of the vehicle-manipulator system is the sum of the kinetic energies of all bodies in the chain. Using absolute velocities in the body coordinate frames:  
+\begin{align}
+\begin{split}
+    K({g_0^I},\dot{g}^I_0,q_\mathfrak{m},\dot{q}_\mathfrak{m})&=\frac{1}{2}\ll^iV^I_i,^iV^I_i\gg\\
+    &=\sum \frac{1}{2} {{}^iV_i^I}^T(^i\mathcal{M}_i){}^iV_i^I.
+\end{split}
+\label{kineticenergy}
+\end{align}
+where the body velocity ${}^iV_i^I$ is found from \eqref{bodyvelocity}. The inner product $\ll,\gg$ is defined based on the left-invariant mass metric $^i\mathcal{M}_i$ on $\SE$, found from Body $i$'s linear and angular inertia represented in the respective joint coordinate frame: %(which for the base is its own body-fixed frame).
+\begin{equation}
+    ^i\mathcal{M}_i=\Ad_{g^i_{cm,i}}^{-T}\begin{bmatrix}m_i\times \mathbb{I}_{3\times3} & \mathbb{O}_{3\times3}\\\mathbb{O}_{3\times3} & \mathfrak{I}_i\end{bmatrix}\Ad_{g^i_{cm,i}}^{-1}.
+    \label{mass}
+\end{equation}
+where $m_i$ is the mass of Body $i$ and  the $3 \times 3$ matrix $\mathfrak{I}_i$ is the same body's moment of inertia. 
+The body velocities can be collected in a vector form $\begin{bmatrix}({}^0V^I_0)^T & \cdots & ({}^nV^I_n)^T \end{bmatrix}^T$, and each substituted from \eqref{bodyvelocity} to find
+\begin{equation}
+    \begin{bmatrix}{^0V_{0}^I} \\ \vdots \\ {^nV_{n}^I}\end{bmatrix}& =\begin{bmatrix}{}^0J^I_0({q}_\mathfrak{m})\\ {}^1J^I_1({q}_\mathfrak{m})\\ \vdots\\ {}^nJ^I_n({q}_\mathfrak{m})\end{bmatrix} \begin{bmatrix}^0\V^I_0\\\dot{q}_\mathfrak{m}\end{bmatrix}.
+\end{equation}
+We introduce the total Jacobian matrix of the multi-body system $\mathcal{J}$ as
+\begin{equation}
+    \mathcal{J}(q_\mathfrak{m}):=\diag_0^n\{\Ad_{\bar{g}^0_i}\}\begin{bmatrix}{}^0J^I_0(q_\mathfrak{m})\\ {}^1J^I_1(q_\mathfrak{m})\\ \vdots\\ {}^nJ^I_n(q_\mathfrak{m})\end{bmatrix},
+    \label{totalJ}
+\end{equation}
+where the function $\diag_0^n\{\cdot\}$ is the block diagonal matrix of its arguments for $i=0,\cdots,n$ (note that $\Ad_{\bar{g}^0_0}=\mathbb{I}_{6\times 6}$). Therefore,
+\begin{equation}
+    \begin{bmatrix}{^0V_{0}^I} \\ \vdots \\ {^nV_{n}^I}\end{bmatrix}=
+\diag^n_0\{\Ad_{\bar{g}^0_i}^{-1}\}\mathcal{J}\begin{bmatrix}^0\V^I_0\\\dot{q}_\mathfrak{m}\end{bmatrix},
+    \label{velvec}
+\end{equation}
+and the kinetic energy in \eqref{kineticenergy} becomes
+\begin{equation}
+    K=\frac{1}{2}\begin{bmatrix}^0\V^I_0 \\ \dot{q}_\mathfrak{m}\end{bmatrix}^T M(q_\mathfrak{m}) \begin{bmatrix}^0\V^I_0\\\dot{q}_\mathfrak{m}\end{bmatrix},
+\end{equation}
+for the generalized mass matrix 
+\begin{equation}
+    M(q_\mathfrak{m})=\mathcal{J}^T(\diag^n_0\{\mathfrak{M}_i\})\mathcal{J}.%\Xi^TL^T (diag\{^i\mathcal{M}_i\})L \Xi
+    \label{totalM}
+\end{equation}
+Here, $\mathfrak{M}_i$ is the inertial mass matrix of Body $i$ oriented in its initial configuration:
+\begin{equation}
+    \mathfrak{M}_i :=\Ad_{\bar{g}^0_i}^{-T}({}^i\mathcal{M}_i)\Ad_{\bar{g}^0_i}^{-1}.
+    \label{initmass}
+\end{equation}
+Since the resulting kinetic energy is independent of the pose of the base, we can drop the mass metric used in the definition of the $\L$agrangian $\L$ to $\q^0_0\times TQ_\m$. The potential $U$ can also be dropped to $Q_\m$ due its assumed invariance. Accordingly, we can define the reduced $\L$agrangian $\ell^0$.
+\end{proof}
+
+%%%
+%Kinetic energy metric (Mass)
+%%%
+\begin{lemma}
+The total Jacobian defined in \eqref{totalJ} can be decomposed into a constant matrix $\Xi$ and a configuration-dependent matrix $\mathfrak{L}$:
+\begin{equation}
+    \mathcal{J}(q_\mathfrak{m})=\mathfrak{L}(q_\mathfrak{m})\Xi.
+\end{equation}
+where 
+\begin{equation}
+\Xi:=\begin{bmatrix}\iota_0 &\mathbb{O}_{6\times n}\\\mathbb{O}_{6n\times b}& \diag_1^n\{\xi_i\}\end{bmatrix}=\begin{bmatrix}\iota_0&\mathbb{O}_{6\times n}\\\mathbb{O}_{6n\times b}&\Xi_\mathfrak{m}\end{bmatrix},
+\end{equation}
+with each $\xi_i$ defined in \eqref{twist}. Further, 
+\begin{equation}
+\mathfrak{L}(q_\mathfrak{m}):=\begin{bmatrix}\mathbb{I}_{6\times6}& \mathbb{O}_{6\times 6} & \cdots&\cdots&\mathbb{O}_{6\times 6}\\ \Add_1^1&\mathbb{I}_{6\times6}&\mathbb{O}_{6\times 6}&\cdots&\mathbb{O}_{6\times 6}\\ \Add^1_2 & \Add^2_2 &\mathbb{I}_{6\times6}&\cdots&\mathbb{O}_{6\times6}\\ \vdots &\vdots & \vdots &\vdots & \vdots\\ \Add^1_n& \Add^2_n &\Add^3_n&\cdots&\mathbb{I}_{6\times6}\end{bmatrix}
+\label{LofJ}
+\end{equation}
+where
+\begin{equation}
+    \Add^j_i=\Ad_{e^{-\xi_{i}q_{i}}\cdots e^{-\xi_jq_j}}, \quad j>i \in \{1, \cdots , n\}.
+\end{equation}
+\end{lemma}
+\begin{proof}
+By substituting the body and base Jacobians from \eqref{bodyJacobian} and \eqref{baseJacobian} into the definition of the total Jacobian in \eqref{totalJ}, we observe that the resulting $\mathcal{J}$ is equal to the product $\mathfrak{L}(q_\m) \Xi$ as in the statement of the lemma.
+% \begin{equation}L=\begin{bmatrix}I_{6\times6}& 0_6 & \cdots&\cdots&0_6\\ Ad_{e^{-\xi_{1}q_{1}}}&Ad_{e^{-\xi_{1}q_{1}}}& 0_6&\cdots&0_6\\ Ad_{e^{-\xi_{2}q_{2}}e^{-\xi_1q_1}}&Ad_{e^{-\xi_2q_2}e^{-\xi_1q_1}}&Ad_{e^{-\xi_{2}q_{2}}}&\cdots&0_6\\ \vdots &\vdots & \vdots &\vdots & \vdots\\Ad_{e^{-\xi_{n}q_{n}}\cdots e^{-\xi_1q_1}}& Ad_{e^{-\xi_{n}q_{n}}\cdots e^{-\xi_1q_1}} &Ad_{e^{-\xi_nq_n}\cdots e^{-\xi_2q_2}}&\cdots&Ad_{e^{-\xi_{n}q_{n}}} \end{bmatrix}\end{equation}
+Note that the block diagonal elements of the matrix $\mathfrak{L}$ have been substituted by the identity matrix, since for every $i \in \{1,\cdots,n\}$ we have the identity:
+\begin{equation*}
+    \Ad_{e^{\xi_iq_i}}\xi_i=\xi_i.
+\end{equation*} 
+\end{proof}
+The matrix $\mathfrak{L}$ can be further decomposed into block components that will be used in the definition of the mechanical connection:
+\begin{equation}
+    \mathfrak{L}=\begin{bmatrix}\mathbb{I}_{6\times6} &\mathbb{O}_{6\times 6n}\\
+    \mathfrak{L}_{\m0}&\mathfrak{L}_\mathfrak{m}\end{bmatrix}
+\end{equation}
+where
+\begin{equation}
+    %\mathfrak{L}_{0}= I\quad \quad \quad \quad&\& \quad \mathfrak{L}_{0m}=\mathfrak{L}_{m0}^T\\ 
+    \mathfrak{L}_{\mathfrak{m}0}:=\begin{bmatrix} \Add_1^1\\ \Add^1_2 \\ \vdots \\ \Add^1_n \end{bmatrix}
+    \quad &\& \quad
+    \mathfrak{L}_\mathfrak{m}=\begin{bmatrix} \mathbb{I}_{6\times6}&\mathbb{O}_{6\times 6}&\cdots&\mathbb{O}_{6\times 6}\\ \Add^2_2 &\mathbb{I}_{6\times6}&\cdots&\mathbb{O}_{6\times 6}\\ \vdots &\vdots & \vdots &\vdots \\ \Add^2_n &\Add^3_n&\cdots&\mathbb{I}_{6\times6} \end{bmatrix}     .
+\end{equation}
+It can be observed from the definition of total mass matrix in \eqref{totalJ}, \eqref{totalM}, and \eqref{LofJ} that $\ell^0$ is $g^I_0$-independent:
+\begin{equation}
+    \ell^0=\frac{1}{2}\begin{bmatrix}^0\V^I_0 \\ \dot{q}_\mathfrak{m}\end{bmatrix}^T \begin{bmatrix} M_0 & M_{0\mathfrak{m}} \\ M_{0\mathfrak{m}}^T & M_\mathfrak{m} \end{bmatrix} \begin{bmatrix}^0\V^I_0\\\dot{q}_\mathfrak{m}\end{bmatrix}-u,
+    \label{l0}
+\end{equation}
+where the block components $M_0\colon \q^0_0\rightarrow {\q^0_0}^*$ and $M_{0\m}\colon TQ_\m\rightarrow {\q^0_0}^*$ are locked mass matrices\cite{chhabra2015symplectic} given by:
+\begin{alignat}{3}
+  &M_0&&=\iota_0^T(\mathfrak{M}_0+\mathfrak{L}_{\mathfrak{m}0}^T (\diag^n_1\{\mathfrak{M}_i\})\mathfrak{L}_{\mathfrak{m}0})\iota_0,\\%{}^0\mathcal{M}_0\\
+  &M_{0\m}&&=\iota_0^T{\mathfrak{L}_{\mathfrak{m}0}}^T (\diag^n_1\{\mathfrak{M}_i\}) \mathfrak{L}_\mathfrak{m} \Xi_\mathfrak{m},\\
+  &M_{\mathfrak{m}}&&=\Xi_\mathfrak{m}^T\mathfrak{L}_{\m} ^T (\diag^n_1\{\mathfrak{M}_i\}) \mathfrak{L}_\mathfrak{m}\Xi_\mathfrak{m}.
+\end{alignat}
+\begin{definition}
+%Now,considerthefibre-wiselinearmapM:T∗Q→Lie∗(G),calledmomentummap,whichisdefinedby⟨Mq(pq),ξ⟩:=⟨φ∗q(pq),ξ⟩=⟨pq,ξQ(q)⟩.
+We define the \textit{spatial mechanical connection}  $\mathcal{A}_I\colon Q_0^I\times \q^0_0 \times TQ_\m \rightarrow \q^I_I$ on the principal bundle $Q^I_0 \times Q_\m \rightarrow Q_\m$ based on the left translation action of $Q^I_I$ to be the map that assigns to each $({}^0\V^I_0,\dot{q}_\m)$ the corresponding absolute velocity of the locked system expressed in the inertial coordinate frame:
+\begin{equation}
+    \A_I(q)\begin{bmatrix}
+{}^0\mathcal{V}_0^I\\ \dot{q}_\mathfrak{m}
+\end{bmatrix}:=\Ad_{g^I_0}({}^0\V^I_0+\A(q_\m)\dot{q}_\m),
+\end{equation}
+with the fiber-wise linear mapping $\A\colon TQ_\m \rightarrow \q^0_0$ defined as 
+\begin{equation}
+  \A(q_\m):= M_0^{-1}(q_\m)M_{0\m}(q_\m).
+  \label{specialjabocian}
+\end{equation}
+We define the \textit{body mechanical connection} $\A_0:Q_0^I\times\q^0_0\times TQ_\m \rightarrow \q^0_0$ on the principal bundle $Q^I_0 \times Q_\m \rightarrow Q_\m$ based on the right action of $Q^0_0$ as the map that assigns to each $({}^0\V^I_0,\dot{q}_\m)$ the corresponding absolute velocity of the locked system expressed in the base vehicle's coordinate frame:
+\begin{equation}
+   \A_0(q)\begin{bmatrix}
+{}^0\mathcal{V}_0^I\\ \dot{q}_\mathfrak{m}
+\end{bmatrix}:={}^0\V^I_0+\A(q_\m)\dot{q}_\m.
+\end{equation}
+Note that $\A_0$ is independent of the elements of $Q_0^I$.
+%We assume, to be specific, that one has a metric hh , ii on Q that is invariant under the group action. (Otherwise, use the second fiber derivative of the Lagrangian as the “metric”).
+\qed
+\end{definition} 
+%The introduction of this mechanical connection gives us horizontal and vertical bundles. 
+%Do I define the momentum map here? \\
+
+In Appendix \ref{app:connection} we show that $\A_I$ and $\A_0$ satisfy the properties of a principal connection. Both mechanical connections are defined on the tangent bundle of the configuration manifold $TQ=TQ_0^I \times TQ_\m$, where the component $TQ_0^I$ has been conveniently left-trivialized. The vertical and horizontal sub-bundles of the connections $\A_I$ and $A_0$ are the same, and are respectively identified by:
+\begin{align}
+\begin{split}
+    \textbf{Ver}_{q}&:=\{(\O,0)|\O \in \q^0_0\}\subset \q^0_0 \times T_{q_\m}Q_\m,\\
+    \textbf{Hor}_{q}&:=\{(^0\V^I_0,\dot q_\m)|{}^0\V^I_0+\A\dot{q}_\m=0\}\subset \q^0_0 \times T_{q_\m}Q_\m.
+\end{split}
+\end{align}
+The corresponding vertical and horizontal projection maps are:
+\begin{align}
+\begin{split}
+   \textbf{ver}_{q}(^0\V^I_0,\dot q_\m)&:=({}^0\V^I_0+\A\dot{q}_\m,0),\\ \textbf{hor}_{q}(^0\V^I_0,\dot q_\m)&:=(-\A\dot{q}_\m,\dot{q}_\m).
+\end{split}
+\end{align}
+% where the horizontal spaces are sub-manifolds of $\q^I_I\times TQ_\m$ and $\q^0_0\times TQ_\m$ that corresponding to the motion of vehicle-manipulator system with zero total momentum \cite{bloch}.
+% The vertical sub-bundles are equivalently the spaces of vectors that are mapped to zero in the principal bundle $Q^I_0 \times Q_\m \rightarrow Q_\m$ or the image of the aforementioned connections. 
+Let
+\begin{equation}
+    \O:={}^0\V^I_0+\A\dot{q}_\m\in\q_0^0
+    \label{lockedangularvelocity}
+\end{equation} 
+be the absolute velocity of the locked system about its center of mass expressed in the vehicle's coordinate frame.  
+These two projection maps allow the decomposition of motion/dynamics into two complementary directions, conveniently parameterized by $\O$ and $\dot{q}_\m$.
+
+
+
+%The idea is to use these two spaces to decompose the dynamics into two complementary directions. It is obvious from the definition of the horizontal subspace $\textbf{hor}_q$  that it is  fully parametrizable by the set $\dot{q}_m$ as fixing the internal velocities will naturally induce a forced base motion on this space (reword). $\Omega$ now parametrizes the vertical subspace $\textbf{vert}_q$ and is appropriately used instead of the induced $^0\V^I_0$ coordinates by the projection maps to identify the external dynamics of the system. 
+%allows the following change of variable
+% \begin{equation}
+% \Omega=\A_0 \begin{bmatrix}
+% {}^0\mathcal{V}_0^I\\ \dot{q}_\mathfrak{m}
+% \end{bmatrix},\label{omega}
+% \label{omega}
+% \end{equation}
+
+\begin{lemma}
+By the change of variables $(^0\V^I_0,\dot q_\m) \mapsto (\O,\dot q_\m)$, the $\L$agrangian of a vehicle-manipulator system $\ell^0$ in \eqref{l0} transforms into %the locally restricted $\L$agrangian
+\begin{equation}
+    \ell^{cm}=
+    \frac{1}{2}\begin{bmatrix}\O\\\dot{q}_\mathfrak{m}\end{bmatrix}^T \begin{bmatrix}M_0 & \mathbb{O}_{b\times n}\\ \mathbb{O}_{n\times b} & M_\mathfrak{m}-\A^TM_0\A\end{bmatrix} \begin{bmatrix}\O\\\dot{q}_\mathfrak{m}\end{bmatrix}-u.
+\end{equation}
+with a block-diagonal mass matrix for expressing the kinetic energy of the system.
+\end{lemma}
+\begin{proof}[Proof]
+The proof is a straightforward computation.
+% The $Q^0_0$-invariance of $\ell^0$ implies the $\L$agrangian $\mathcal{L} = \ell^0: \q^0_0 \times Q_\m \rightarrow \mathbb{R}$ does not explicitly depend on the base configuration $g^I_0$, i.e., the energy of the system is symmetric. (note: The left action of the $Q^0_0$ on the total configuration manifold of the system is the symmetry of $\ell^0$)
+% Thus, by knowing that the Lie group structure of the base configuration acts on the configuration space, one can lift its group action/ energy to the tangent space $TQ$ via the tangent operation % If you have a subgroup M¯of a quotient group G/N, the lift of M¯ is a subgroup M of G such that the M¯is the image of M under the projection homomorphism G→G/N. % so that we can have all the info we need by which is defined on the quotient of the tangent bundle. so that it locally drops to the quotient(see Appendix \ref{Appendix:geometric}) %the Lagrangian can be reduced to
+% $\ell^0:T(Q/Q_0^I)\rightarrow\R$. Here, $T(Q/Q_0^I)$ is a $\q^0_0$ bundle over $T(Q/Q^0_0)$ (?describe meaning), which is found from the fiber-wise Jacobian-like mapping $\A$ defined in \ref{specialjabocian}.
+% This enables the convenient change of variables from ${}^0\V_0^I$ to the local version of the locked angular velocity $\Omega$:
+% \begin{align}
+%     \begin{split}
+%       \Omega&={}^0\V_0^I+\A\dot{q}_\mathfrak{m}\\ \dot{g}^I_0&=(\iota_0)^{-1} g^I_0(\Omega-\A\dot{q}_\mathfrak{m}). 
+%     \end{split}
+% \end{align}
+% which, if the momentum of the system relative to the inertia is conserved, is physically equivalent to the absolute angular velocity of the entire system observed from the base fame.
+% Hence, the explicit expression of the restricted kinetic energy metric $k(q_\mathfrak{m},\dot{q}_\mathfrak{m},\Omega)=K(q_\mathfrak{m},{g^I_0}^{-1}{g}^I_0,\dot{q}_\mathfrak{m},{g^I_0}^{-1}\dot{g}^I_0)$ to the space of velocities at the identity configuration is found 
+% \begin{equation}
+%     k=\frac{1}{2}\begin{bmatrix}\Omega^T&\dot{q}_\mathfrak{m}^T\end{bmatrix} \begin{bmatrix}M_0 & 0\\ 0 & M_\mathfrak{m}-\A^TM_0\A\end{bmatrix} \begin{bmatrix}\Omega\\\dot{q}_\mathfrak{m}\end{bmatrix}.
+% \end{equation}
+\end{proof}
+
+\begin{example}{ \textit{Spacecraft Manipulator:}}
+By knowing the mass matrices of the bodies in the chain:
+\begin{equation*}
+    ^0\mathcal{M}_0=\begin{bmatrix}m_0\times \mathbb{I}_{3\times3} & \mathbb{O}_{3\times3}\\\mathbb{O}_{3\times3} & \mathfrak{I}_0\end{bmatrix}
+\end{equation*}
+\begin{equation*}
+    ^1\mathcal{M}_1=\begin{bmatrix} m_1\times \mathbb{I}_{3\times3} & m_1\begin{bmatrix}
+    0 & -\frac{l_1}{2} & 0\\\frac{l_1}{2} & 0 & 0\\0 & 0 & 0\end{bmatrix}\\m_1\begin{bmatrix}
+    0 & -\frac{l_1}{2} & 0\\\frac{l_1}{2} & 0 & 0\\0 & 0 & 0\end{bmatrix} & \mathfrak{I}_1-m_1\begin{bmatrix}
+    \frac{1}{4}l_1^2 & 0 & 0\\0 & \frac{1}{4}l_1^2 & 0\\0 & 0 & 0\end{bmatrix}\end{bmatrix}
+\end{equation*}
+\begin{equation*}
+    ^1\mathcal{M}_2=\begin{bmatrix} m_2\times \mathbb{I}_{3\times3} & m_1\begin{bmatrix}
+    0 & -\frac{l_2}{2} & 0\\\frac{l_2}{2} & 0 & 0\\0 & 0 & 0\end{bmatrix}\\m_2\begin{bmatrix}
+    0 & -\frac{l_2}{2} & 0\\\frac{l_2}{2} & 0 & 0\\0 & 0 & 0\end{bmatrix} & \mathfrak{I}_2-m_2\begin{bmatrix}
+    \frac{1}{4}l_2^2 & 0 & 0\\0 & \frac{1}{4}l_2^2 & 0\\0 & 0 & 0\end{bmatrix}\end{bmatrix}
+\end{equation*}
+
+\begin{equation*}
+    \mathfrak{M}_0={}^0\mathcal{M}_0
+\end{equation*}
+
+\begin{strip}
+\begin{equation*}
+    \mathfrak{M}_1=\begin{bmatrix}
+    m_1\times \mathbb{I}_{3\times 3} & m_1\begin{bmatrix}
+    0 &-(l_0+\frac{l_1}{2}) & 0\\(l_0+\frac{l_1}{2}) & 0&0 \\0 &0 &0
+    \end{bmatrix}\\ m_1\begin{bmatrix}
+    0 &-(l_0+\frac{l_1}{2}) & 0\\(l_0+\frac{l_1}{2}) & 0&0 \\0 &0 &0
+    \end{bmatrix}& \mathfrak{I}_1-m_1\begin{bmatrix}
+    -(\frac{l_1^2}{4}+l_0^2+l_0l_1) & 0 & 0\\0 & -(\frac{l_1^2}{4}+l_0^2+l_0l_1)& 0\\ 0 & 0 & 0
+    \end{bmatrix}
+    \end{bmatrix}.
+\end{equation*}
+
+\begin{equation*}
+    \mathfrak{M}_2=\begin{bmatrix}
+    m_2\times \mathbb{I}_{3\times 3} & m_2\begin{bmatrix}
+    0 &-(l_0+l_1+\frac{l_2}{2}) & 0\\(l_0+l_1+\frac{l_2}{2}) & 0&0 \\0 &0 &0
+    \end{bmatrix}\\ m_2\begin{bmatrix}
+    0 &-(l_0+l_1+\frac{l_2}{2}) & 0\\(l_0+l_1+\frac{l_2}{2}) & 0&0 \\0 &0 &0
+    \end{bmatrix}& \mathfrak{I}_2-m_2\begin{bmatrix}
+    -(\frac{l_1^2}{4}+l_0^2+l_0l_1) & 0 & 0\\0 & - -(\frac{l_1^2}{4}+l_0^2+l_0l_1)& 0\\ 0 & 0 & 0
+    \end{bmatrix}
+    \end{bmatrix}.
+\end{equation*}
+\end{strip}
+
+
+
+
+\begin{equation*}
+    \Xi_\m:=\resizebox{0.8\hsize}{!}{\begin{bmatrix}
+     0 & 0 & 1 & 0 & l_0 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
+     0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & -(l_0+l_1) & 0 & 0
+    \end{bmatrix}}^T
+\end{equation*}
+
+\begin{equation*}
+    \mathfrak{L}:=\begin{bmatrix}\mathbb{I}_{6\times6}& \mathbb{O}_{6\times 6} &  \mathbb{O}_{6\times 6}\\ \Ad_{e^{-\xi_{1}q_{1}}}&\mathbb{I}_{6\times6}&\mathbb{O}_{6\times 6}\\ \Ad_{e^{-\xi_{2}q_{2}}}\Ad_{ e^{-\xi_1q_1}} & \Ad_{e^{-\xi_{2}q_{2}}} &\mathbb{I}_{6\times6}\end{bmatrix}
+\end{equation*}
+
+\begin{equation*}
+    \mathfrak{L}_{\m 0}:=\begin{bmatrix} \Ad_{e^{-\xi_{1}q_{1}}}\\ \Ad_{e^{-\xi_{2}q_{2}}}\Ad_{ e^{-\xi_1q_1}} \end{bmatrix} \quad \& \quad \mathfrak{L}_{\m}:=\begin{bmatrix}\mathbb{I}_{6\times6}&\mathbb{O}_{6\times 6}\\ \Ad_{e^{-\xi_{2}q_{2}}} &\mathbb{I}_{6\times6}\end{bmatrix}
+\end{equation*}
+
+\begin{equation*}
+    \mathcal{J}(q_\mathfrak{m})=\mathfrak{L}(q_\mathfrak{m})\Xi
+\end{equation*}
+
+\end{example}
+
+\begin{theorem}[Lagrange-Poincar\'{e} Equations for Vehicle-Manipulator Systems] Given a vehicle-manipulator system with the base configuration $g^I_0\in Q_0^I$, arm coordinates $q_\mathfrak{m}\in Q_\m$, input forces $F_{cm}\in (\q_0^0)^*$ and $F_\mathfrak{m}\in T^*Q_\m$ that are collocated with the absolute velocity of the locked system $\O$ and the joint velocities $\dot q_\m$, respectively, and the  $\L$agrangian $\L$ in \eqref{lagrangianfirst} that is invariant with respect to the base vehicle's configuration, the singularity-free external/internal dynamical equations of the system reads: % individual body masses ${}^i\mathcal{M}_i$, overall angular momentum $P$, potential energy $U(g^I_0,q_\m)$, and kinetic energy $K=\sum \frac{1}{2} {{}^iV_i^I}^T(^i\mathcal{M}_i){}^iV_i^I$, the decoupled external and internal dynamics can be written as
+\begin{align}
+    -\dot{P}+\textbf{ad}^*_{^0V^I_0}P=F_{cm}
     \label{euler-poincare_eq}
 \end{align}
 \begin{equation}
-    {\hat{M}_{m}\ddot{q}_\mathfrak{m}+\dot{q}_\mathfrak{m}^T\hat{C}_{m}\dot{q}_\mathfrak{m}+\hat{N}_{m}=F_\mathfrak{m}-F_{\Omega}J_{sp},}
+    {\hat{M}_{m}\ddot{q}_\mathfrak{m}+\dot{q}_\mathfrak{m}^T\hat{C}_{m}\dot{q}_\mathfrak{m}+\hat{N}_{m}=F_\mathfrak{m}-F_{cg}\A+\frac{\partial U}{\partial q_\m},}
 \end{equation}
 with
 \begin{equation}
-    P=\frac{\partial l}{\partial \Omega}=M_0 \Omega + M_0 J_{sp}\dot{q}_\mathfrak{m},
+    P=\frac{\partial l}{\partial \O}=M_0 \O,% + M_0 \A\dot{q}_\mathfrak{m},
 \end{equation}
 \begin{equation}
-    \hat{M}_\mathfrak{m}=M_\mathfrak{m}-J_{sp}^TM_0J_{sp},
+    \hat{M}_\mathfrak{m}=M_\mathfrak{m}-\A^TM_0\A,
 \end{equation}
 \begin{equation}
     {(\hat{C}_{m})=\bigg(\sum\frac{\partial \hat{M}_\mathfrak{m}}{\partial{q}_i}\dot{q}_i-\frac{1}{2}\begin{bmatrix}\dot{q}^T\frac{\partial \hat{M}_\mathfrak{m}}{\partial q_1}\\\dot{q}^T\frac{\partial \hat{M}_\mathfrak{m}}{\partial q_2}\\ \vdots\\\dot{q}^T\frac{\partial \hat{M}_\mathfrak{m}}{\partial q_n}\\\end{bmatrix}\bigg)}
 \end{equation}
 \begin{multline}
-    <\hat{N},\delta q_\mathfrak{m}>=<P,[J_{sp}\dot{q}_\mathfrak{m},J_{sp}\delta q_\mathfrak{m}]-\frac{\partial J_{sp}}{\partial q_\mathfrak{m}}\dot{q}_\mathfrak{m}\delta q\\
-    +\frac{\partial J_{sp}}{\partial q_\mathfrak{m}}\delta q_\mathfrak{m} \dot{q}_\mathfrak{m}-[\Omega,J_{sp}\delta q_\mathfrak{m}]>,
+    <\hat{N},\delta q_\mathfrak{m}>=<P,[\A\dot{q}_\mathfrak{m},\A\delta q_\mathfrak{m}]-\frac{\partial \A}{\partial q_\mathfrak{m}}\dot{q}_\mathfrak{m}\delta q\\
+    +\frac{\partial \A}{\partial q_\mathfrak{m}}\delta q_\mathfrak{m} \dot{q}_\mathfrak{m}-[\Omega,\A\delta q_\mathfrak{m}]>,
 \end{multline}
-\begin{equation}
-  J_{sp} = M_0^{-1}M_{0m},
-\end{equation}
-where the following properties have been used:
-\begin{equation}
-  M(q_\mathfrak{m})=\begin{bmatrix} M_0 & M_{0\mathfrak{m}} \\ M_{\mathfrak{m}0} & M_\mathfrak{m} \end{bmatrix},    
-\end{equation}
-\begin{equation}
-    M(q_\mathfrak{m})=\mathcal{J}^T(diag\{Ad_{g^b_i(0)}^{-T}({}^i\mathcal{M}_i)Ad_{g^b_i(0)}^{-1}\})\mathcal{J},%\Xi^TL^T (diag\{^i\mathcal{M}_i\})L \Xi
-    \label{totalM}
-\end{equation}
-\begin{equation}
-    \Omega={}^0V_0^I+J_{sp}\dot{q}_\mathfrak{m}
-\end{equation}
-where the total jacobian $\mathcal{J}$ is found from \eqref{totalJ}.% and special jacobian $J_{sp}$ is defined in \eqref{}.
+where $\A$ is found from \eqref{specialjabocian}, $M(q_\m)$ is found from \eqref{mass}
+%  \A = M_0^{-1}M_{0m},
+%where the following properties have been used:
+%\begin{equation}
+%  M(q_\mathfrak{m})=\begin{bmatrix} M_0 & M_{0\mathfrak{m}} \\ M_{\mathfrak{m}0} & M_\mathfrak{m} \end{bmatrix},    
+%\end{equation}
+%\begin{equation}
+%    M(q_\mathfrak{m})=\mathcal{J}^T(\diag\{Ad_{g^b_i(0)}^{-T}({}^i\mathcal{M}_i)Ad_{g^b_i(0)}^{-1}\})\mathcal{J},%\Xi^TL^T (diag\{^i\mathcal{M}_i\})L \Xi
+%\end{equation}
+%\begin{equation}
+%    \Omega={}^0V_0^I+\A\dot{q}_\mathfrak{m}
+%\end{equation}
+and the total Jacobian $\mathcal{J}$ is found from \eqref{totalJ}.% and special Jacobian $\A$ is defined in \eqref{}.
 %The invariance of the restricted action $l(q_\mathfrak{m},\dot{q}_\mathfrak{m},{g^I_0}^{-1}\dot{g}^I_0)$ has been exploited to define
 
 
@@ -600,7 +1302,7 @@ where the total jacobian $\mathcal{J}$ is found from \eqref{totalJ}.% and specia
 
 %-------------------------------------------------
 \begin{comment}
-To describe the reduced dynamic equations, we make use of a connection on the principal bundle $Q → Q/Q^I_0$ for the Euler–Poincare equations, in which Q = G, the group structure automatically provides such a connection.
+To describe the reduced dynamic equations, we make use of a connection on the principal bundle $Q → Q/Q^I_0$ for the Euler–poincar\'{e} equations, in which Q = G, the group structure automatically provides such a connection.
 For a more general choice of Q one can choose the mechanical
 connection as defined in the previous section. (See Marsden and Scheurle
 [1993b].)
@@ -624,163 +1326,22 @@ With respect to an inertial reference frame, the kinetic energy of a multi-body 
 \end{comment}
 
 \begin{proof}[Proof]
-The dynamics of the multi-body system can be derived from the invariance of its energy metric, the $\mathcal{L}$agrangian $\mathcal{L}$, through a variational principle $\delta \int \mathcal{L}dt=0$. The $\L$agrangian is defined as the sum of kinetic energy and potential energy, which is neglected in this study due to working in an inertial framework. As a result
-\begin{equation}
-    \mathcal{L}=K
-\end{equation}
-\begin{lemma}
-The kinetic energies of all individual bodies can be summed up to find the total $\L$agrangian of the multi-body system as
-\begin{align}
-\begin{split}
-    \L=\frac{1}{2}\begin{bmatrix}^0V^I_0 \\ \dot{q}_\mathfrak{m}\end{bmatrix}^T M(q_\mathfrak{m}) \begin{bmatrix}^0V^I_0\\\dot{q}_\mathfrak{m}\end{bmatrix},
-\end{split}
-\label{kinenergy}
-\end{align}
-where the generalized mass matrix $M$ can be found from \eqref{totalM}.
-\end{lemma} 
-\begin{proof}[Proof] The kinetic energy of the multi-body system on $se(3)$ with respect to the inertia frame is found by summing kinetic energies of all individual bodies in the chain:
-\begin{align}
-\begin{split}
-    K(q_\mathfrak{m},\dot{q}_\mathfrak{m},{g_0^I},{g^I_0}^{-1}\dot{g}^I_0)&=\frac{1}{2}<<^iV^I_i,^iV^I_i>>\\
-    &=\sum \frac{1}{2} {{}^iV_i^I}^T(^i\mathcal{M}_i){}^iV_i^I,    
-\end{split}
-\end{align}
-where the body velocity ${}^iV_i^I$ is found from \eqref{bodyvelocity}. The coefficient of the pairing $<< , >>$ represents the body linear and angular inertia matrices $^i\mathcal{M}_i$ represented in their respective attached joint coordinate frames: %(which for the base is its own body-fixed frame).
-\begin{equation}
-    ^i\mathcal{M}_i=Ad_{g^i_{cm,i}}^{-T}\begin{bmatrix}m_i\times I_{3\times3} & 0_{3\times3_i}\\0_{3\times3} & \mathfrak{I}_{3\times3_i}\end{bmatrix}Ad_{g^i_{cm,i}}^{-1},
-    \label{mass}
-\end{equation}
-where $m_i$ is the mass of body $i$ and $\mathfrak{I}_3\times3_i$ is the same body's moment of inertia matrix. 
-The body velocities can be collected in a vector form $\begin{bmatrix}({}^0V^I_0)^T & \cdots & ({}^nV^I_n)^T \end{bmatrix}^T$, and each substituted from \eqref{bodyvelocity} to find the collected velocity vector 
-\begin{equation}
-    \begin{bmatrix}{^0V_{0}^I} \\ \vdots \\ {^nV_{n}^I}\end{bmatrix}& =\begin{bmatrix}{}^0J^I_0(q)\\ {}^1J^I_1(q)\\ \vdots\\ {}^nJ^I_n(q)\end{bmatrix} \begin{bmatrix}^0V^I_0\\\dot{q}_\mathfrak{m}\end{bmatrix}.
-\end{equation}
-By introducing the Jacobian matrix of the multi-body system $\mathcal{J}$ as
-\begin{equation}
-    \mathcal{J}=diag\{Ad_{g^b_i(0)}\}\begin{bmatrix}{}^0J^I_0(q)\\ {}^1J^I_1(q)\\ \vdots\\ {}^nJ^I_n(q)\end{bmatrix}, \quad i=1,\cdots,n,
-    \label{totalJ}
-\end{equation}
-the velocity vector can be formulated via
-\begin{equation}
-    \begin{bmatrix}{^0V_{0}^I} \\ \vdots \\ {^nV_{n}^I}\end{bmatrix}=diag\{Ad_{g^0_i(0)}^{-1}\}\mathcal{J}\begin{bmatrix}^0V^I_0\\\dot{q}_\mathfrak{m}\end{bmatrix}.
-    \label{velvec}
-\end{equation}
-This can be used to find the $\L$agrangian of \eqref{kinenergy} in a matrix form as
-\begin{equation}
-    \L=\frac{1}{2}\begin{bmatrix}^0V^I_0 \\ \dot{q}_\mathfrak{m}\end{bmatrix}^T M(q_\mathfrak{m}) \begin{bmatrix}^0V^I_0\\\dot{q}_\mathfrak{m}\end{bmatrix},
-\end{equation}
-where the generalized mass matrix $M$ has been defined 
-\begin{equation}
-    M(q_\mathfrak{m})=\mathcal{J}^T(diag\{\mathfrak{M}_i\})\mathcal{J},%\Xi^TL^T (diag\{^i\mathcal{M}_i\})L \Xi
-    \label{totalM}
-\end{equation}
-where $\mathfrak{M}_i$, the mass matrix of Body $i$ in the initial configuration, is
-\begin{equation}
-    \mathfrak{M}_i=Ad_{g^0_i(0)}^{-T}({}^i\mathcal{M}_i)Ad_{g^0_i(0)}^{-1},
-    \label{initmass}
-\end{equation}
-\end{proof}
 
-The total system jacobian of \eqref{totalJ} can be broken down into two parts, via the use of the definitiosn of body and base jacobians in Equations \ref{bodyjacobian} and \ref{basejacobian}
-\begin{equation}
-    \mathcal{J}=L\Xi.
-\end{equation}
-Here, $\Xi$ is defined as
-\begin{equation}
-\Xi=\begin{bmatrix}I&0\\0&diag\bigg\{\xi_i\bigg\}\end{bmatrix}=\begin{bmatrix}I&0\\0&\Xi_\mathfrak{m}\end{bmatrix}, \quad i=1,\cdots,n,
-\end{equation}
-where each $\xi_i$ has been defined in \eqref{twist}. The time-dependent and configuration-dependent term $L$ has been defined as
-\begin{equation}
-L=\begin{bmatrix}I_{6\times6}& 0_6 & \cdots&\cdots&0_6\\ \Add_1^1&I_{6\times6}&0_6&\cdots&0_6\\ \Add^1_2 & \Add^2_2 &I_{6\times6}&\cdots&0_6\\ \vdots &\vdots & \vdots &\vdots & \vdots\\ \Add^1_n& \Add^2_n &\Add^3_n&\cdots&I_{6\times6} \end{bmatrix}
-\label{LofJ}
-\end{equation}
-where
-\begin{equation}
-    \Add^j_i=Ad_{e^{-\xi_{i}q_{i}}\cdots e^{-\xi_jq_j}}, \quad j>i \in 1, \cdots , n,
-\end{equation}
-% \begin{equation}L=\begin{bmatrix}I_{6\times6}& 0_6 & \cdots&\cdots&0_6\\ Ad_{e^{-\xi_{1}q_{1}}}&Ad_{e^{-\xi_{1}q_{1}}}& 0_6&\cdots&0_6\\ Ad_{e^{-\xi_{2}q_{2}}e^{-\xi_1q_1}}&Ad_{e^{-\xi_2q_2}e^{-\xi_1q_1}}&Ad_{e^{-\xi_{2}q_{2}}}&\cdots&0_6\\ \vdots &\vdots & \vdots &\vdots & \vdots\\Ad_{e^{-\xi_{n}q_{n}}\cdots e^{-\xi_1q_1}}& Ad_{e^{-\xi_{n}q_{n}}\cdots e^{-\xi_1q_1}} &Ad_{e^{-\xi_nq_n}\cdots e^{-\xi_2q_2}}&\cdots&Ad_{e^{-\xi_{n}q_{n}}} \end{bmatrix}\end{equation}
-where the following simplification step has been implied: Since the $\xi_i$ are constant in the initial frame of their respective bodies, each $\xi_i$ is unaffected by $Ad_{e^{\xi_iq_i}}$, and thus, the $diag\{Ad_{e^{\xi_iq_i}}\}$ has been dropped from the formulation of $L$. 
-\begin{lemma}
-The total $\L$agrangian of the system, due to its $Q^I_0$-invariance, can be dropped to the quotient $TQ/Q^I_0$ via the following change of variable
-\begin{equation}
-\Omega={}^0V_0^I+J_{sp}\dot{q}_\mathfrak{m}.\label{omega}
-\end{equation}
-which utilizes the symmetry of the system through the special principal mechanical connection
-\begin{equation}
-  J_{sp}= M_0^{-1}M_{0m},
-\end{equation}
-to get the locally restricted energy metric
-\begin{equation}
-    l=\frac{1}{2}\begin{bmatrix}\Omega^T&\dot{q}_\mathfrak{m}^T\end{bmatrix} \begin{bmatrix}M_0 & 0\\ 0 & M_\mathfrak{m}-J_{sp}^TM_0J_{sp}\end{bmatrix} \begin{bmatrix}\Omega\\\dot{q}_\mathfrak{m}\end{bmatrix}
-\end{equation}
-which allows the decoupling of the dynamics to internal end external portions.
-\end{lemma}
-\begin{proof}[Proof]
-It can be observed from the definition of total mass matrix in Equations \ref{totalM}, \ref{totalJ}, and \ref{LofJ} that $g^I_0$ has not explicitely shown up in the formulation of $\mathcal{L}$:
-\begin{equation}
-    \L=\frac{1}{2}\begin{bmatrix}^0V^I_0 \\ \dot{q}_\mathfrak{m}\end{bmatrix}^T \begin{bmatrix} M_0 & M_{0\mathfrak{m}} \\ M_{\mathfrak{m}0} & M_\mathfrak{m} \end{bmatrix} \begin{bmatrix}^0V^I_0\\\dot{q}_\mathfrak{m}\end{bmatrix}
-\end{equation}
-where $M_0$ and $M_{bm}$ are components of the generalized mass matrix $M(q_\mathfrak{m})$:
-\begin{align}
-\begin{split}
-  M_0&=\begin{bmatrix}I\\\Add_1^1\\ \vdots \\ \Add^1_n \end{bmatrix} ^T(diag\{\mathfrak{M}_i\})\begin{bmatrix}I\\\Add_1^1\\ \vdots \\ \Add^1_n \end{bmatrix} \quad i=1,\cdots,n,\\%{}^0\mathcal{M}_0\\
-  M_{0\mathfrak{m}}&=\begin{bmatrix}I\\\Add_1^1\\ \vdots \\ \Add^1_n \end{bmatrix} ^T(diag\{\mathfrak{M}_i\})\begin{bmatrix} I_{6\times6}&0_6&\cdots&0_6\\ \Add^2_2 &I_{6\times6}&\cdots&0_6\\ \vdots &\vdots & \vdots &\vdots\\ \Add^2_n &\Add^3_n&\cdots&I_{6\times6} \end{bmatrix}.
-\end{split}
-\end{align}
-The $Q^I_0$-invariance of $\mathcal{L}$ implies that the $\L$agrangian $\mathcal{L} = \mathcal{L}(q_\mathfrak{m}, \dot{q}_\mathfrak{m},{g^I_0}^{-1}\dot{g}^I_0)$ does not explicitly depend on the base configuration $g^I_0$, i.e., the energy metric of the system is symmetric. %\footnote{The left action of the $Q^I_0$ on the total configuration manifold of the system is the symmetry of $\mathcal{L}$, $Lo\Phi=L$} with respect to the base configuration.
-Thus, by knowing that the Lie group structure of the base configuration acts on the configuration space, one can lift this action to the tangent space $TQ$ via the tangent operation % so that we can have all the info we need by which is defined on the quioriont of the tangent bundle. so that it locally drops to the quotient(see Appendix \ref{Appendix:geometric}) %the Lagrangian can be reduced to
-$l:TQ/Q_0^I\rightarrow\R$. Here, $TQ/Q_0^I$ is a $\g^0_0$ bundle over $T(Q/Q^0_0)$ (?describe meaning), which is found from a principal mechanical connection $J_{sp}$ on the principal bundle $TQ\rightarrow \g^0_0$. This connection is defined as
-\begin{equation}
-  J_{sp} := M_0^{-1}M_{0m}: \quad  TQ\rightarrow \g^0_0.
-\end{equation}
-This enables the convenient change of variables from ${}^0V_0^I$ to the local version of the locked angular velocity $\Omega$:
-\begin{align}
-    \begin{split}
-       \Omega&={}^0V_0^I+J_{sp}\dot{q}_\mathfrak{m}\\ \dot{g}^I_0&=g^I_0(\Omega-J_{sp}\dot{q}_\mathfrak{m}). 
-    \end{split}
-\end{align}
-which (if the momentum of the system relative to the inertia is conserved) has the physical interpretation of the relative body angular velocity of the entire system with respect to the inertial frame represented in the frame of the base.
-Hence, the explicit expression of the restricted $\L$agrangian $l(q_\mathfrak{m},\dot{q}_\mathfrak{m},\Omega)=\mathcal{L}(q_\mathfrak{m},{g^I_0}^{-1}{g}^I_0,\dot{q}_\mathfrak{m},{g^I_0}^{-1}\dot{g}^I_0)$ to the space of velocities at the identity configuration is found 
-\begin{equation}
-    l=\frac{1}{2}\begin{bmatrix}\Omega^T&\dot{q}_\mathfrak{m}^T\end{bmatrix} \begin{bmatrix}M_0 & 0\\ 0 & M_\mathfrak{m}-J_{sp}^TM_0J_{sp}\end{bmatrix} \begin{bmatrix}\Omega\\\dot{q}_\mathfrak{m}\end{bmatrix}.
-\end{equation}
-\end{proof}
-The equations of motion of the multi-body system can be found from the fact that this locally restricted action functional has to satisfy the variational principle just like $\L$:
-\begin{equation}
-    \delta \int \Big(l(q_\mathfrak{m},\dot{q}_\mathfrak{m},\Omega)-\mathcal{W}_F\Big)dt=0
-\end{equation}
-where $\mathcal{W}_f$ is the performed work associated with $F=(F_\Omega,F_\mathfrak{m})$, the $Q^I_0$-invariant forcing with components $F_\Omega$ and $F_\mathfrak{m}$ corresponding to the base and the arm respectively. The generalized forces can be regarded as members of the dual of $\g^0_0$ for the base vehicle and the dual of the tangent space for the manipulator joint configuration. 
-Using the chain rule of variation, the variational principle can then be written as:
-\begin{multline}
-    \int (\underbrace{\frac{dl}{dq_\mathfrak{m}} \delta q_\mathfrak{m} +\frac{dl}{d\dot{q}_\mathfrak{m}} \delta \dot{q}_\mathfrak{m}}_{(I)} +\underbrace{\frac{dl}{d\Omega} \delta \Omega}_{(II)})dt\\
-        \int (\underbrace{F_\mathfrak{m}\delta q_\mathfrak{m}}_{(III)} + \underbrace{F_\Omega \delta \Omega}_{(IV)})dt=0,
-        \label{variationequation}
-\end{multline}
-where the work done by external forces has been written as the pairing of the variations with the forces acting on the entire system's center of mass ($F_\Omega$) and the arm joints ($F_\mathfrak{m}$) respectively. The terms $(I)$ and $(II)$ are expanded based on Lemma \ref{varlemma}:
-\begin{align}
-\begin{split}
-     (I) &= \int (\frac{dl}{dq_\mathfrak{m}} \delta q_\mathfrak{m})dt -\int (\frac{d}{dt}\frac{dl}{d\dot{q}_\mathfrak{m}} \delta {q}_\mathfrak{m})dt \\
-     &=\int (\frac{dl}{dq_\mathfrak{m}} -\frac{d}{dt}\frac{dl}{d\dot{q}_\mathfrak{m}} )\delta {q}_\mathfrak{m}dt ,
-     \end{split}
-     \label{lpart1}
-\end{align}
-\begin{equation}
-    (II) = \int  \frac{d l}{d\Omega} (\underbrace{(\dot{\eta}\pm ad_{{}^0V^I_0} \eta)}_{(A)} + \underbrace{J_{sp}\delta \dot{q}_\mathfrak{m}+\delta J_{sp}\dot{q}_\mathfrak{m}}_{(B)})dt
-    \label{lpart2}
-\end{equation}
-where $\delta J_{sp}$ is found from \eqref{jspderiv}.
-%Since work is the time-integration of force times velocity or moment times angular velocity one can observe that forces and moments belong to the dual space of the velocities and angular velocities, respectively.
-%which is equivalent to solving the Euler-Lagrange equations for a fully parametrized system.
 \begin{lemma}\label{varlemma}
-The variation of the variable $\Omega$ is found from
+A vehicle-manipulator system with the $\L$agrangian in \eqref{} satisfies the Hamilton's principle if and only if $\ell^{cm}$ satisfies the Hamiltons principle for a variation of the type:
 \begin{equation}
-    \delta \Omega= \dot{\eta}\pm [{}^0V^I_0,\eta] + J_{sp}\delta \dot{q}_\mathfrak{m}+\delta J_{sp}\dot{q}_\mathfrak{m}
+    \delta \Omega= \dot{\eta}\pm [{}^0V^I_0,\eta] + \A\delta \dot{q}_\mathfrak{m}+\delta \A\dot{q}_\mathfrak{m}
 \end{equation}
+%The variation of the variable $\Omega$ is found from
+%\begin{equation}
+%    \delta \Omega= \dot{\eta}\pm [{}^0V^I_0,\eta] + \A\delta \dot{q}_\mathfrak{m}+\delta \A\dot{q}_\mathfrak{m}
+%\end{equation}
 \end{lemma}
 \begin{proof}[Proof ]
 A variation of the smooth curve $q(t) \quad a<t<b $ is a smooth map $\beta: [a,b]\times[-\epsilon,\epsilon]\rightarrow Q^I_0\times Q_\mathfrak{m}$ that  satisfies  the  condition $\beta(t,0)  =q(t)$.  This  variation defines the vector field $\delta q(t) =\frac{\partial \beta(t,s)}{\partial s} |_s=0 $ along the curve $q(t)$. Let us define the variation $\eta$ as the transformation of the variation of the base configuration to the lie algebra
 \begin{align}
   &\eta={g^I_0}^{-1}\delta g^I_0\\ &\eta(t_0,\epsilon)=\eta(t_f,\epsilon)=0
+  \label{etadefinition}
 \end{align}
 Knowing
 % $$ ^bV^o_b={(g^o_b)}^{-1}\dot{g}^o_b$$
@@ -791,26 +1352,60 @@ that for a curve on $Q^I_0$ the order of the variation and differentiation opera
                   &=\dot{\eta}\pm ad_{V^I_0} \eta,
 \end{split}
 \end{align}
-
 which is the varying parameter of the path of the base vehicle and vanishes at the endpoints. The variation of the defined $\Omega$ can thus be found from the chain rule of variation:
 \begin{align}
 \begin{split}
-    \delta \Omega &= \delta {}^0V^I_0+ \delta (J_{sp}\dot{q}_\mathfrak{m})\\
-    &= \dot{\eta}\pm [{}^0V^I_0,\eta] + J_{sp}\delta \dot{q}_\mathfrak{m}+\delta J_{sp}\dot{q}_\mathfrak{m}
+    \delta \Omega &= \delta {}^0V^I_0+ \delta (\A\dot{q}_\mathfrak{m})\\
+    &= \dot{\eta}\pm [{}^0V^I_0,\eta] + \A\delta \dot{q}_\mathfrak{m}+\delta \A\dot{q}_\mathfrak{m}
     \end{split}
 \end{align}
 \end{proof}
+Therefore, the reduced action functional $\ell^{cm}$ has to satisfy the Lagrange-D'alembert principle just like $\L$:
+\begin{equation}
+    \delta \int \Big(l(q_\mathfrak{m},\dot{q}_\mathfrak{m},\Omega)\Big)dt- \int \Big( F_e\delta q \Big) dt=0
+\end{equation}
+where $F_e\delta q$ is the virtual work associated with external forces $F_e=(F_{cg},F_\mathfrak{m})$, the $Q^I_0$-invariant forcing with components $F_{cg}$ and $F_\mathfrak{m}$ corresponding to the base and the arm respectively. The generalized forces can be regarded as members of the dual of $\g^0_0$ for the base vehicle and the dual of the tangent space for the manipulator joint configuration.% The work done by external forces is the pairing of the variations with the forces acting on the entire system's center of mass ($F_{cg}$) and the arm joints ($F_\mathfrak{m}$) respectively.
+Using the chain rule of variation, the variational principle can then be written as:
+\begin{multline}
+    \int (\underbrace{\frac{\partial l}{\partial q_\mathfrak{m}} \delta q_\mathfrak{m} +\frac{\partial l}{\partial\dot{q}_\mathfrak{m}} \delta \dot{q}_\mathfrak{m}}_{(I)} +\underbrace{\frac{\partial l}{\partial\Omega} \delta \Omega}_{(II)})dt\\
+        -\int (\underbrace{\frac{\partial u}{\partial \eta} \delta \eta+\frac{\partial u}{\partial q_\m} \delta q_\m}_{(III)} +\underbrace{F_{cm}\delta \eta +F_{\m}\delta q_\m}_{(IV)})dt=0, %+ \frac{dU}{dg^I_0} g^I_0\delta\eta
+        \label{variationequation}
+\end{multline}
+
+
+The terms $(I)$ and $(II)$ in \ref{variationequation} are expanded based on Lemma \ref{varlemma}:
+\begin{align}
+\begin{split}
+     (I) &= \int (\frac{dl}{dq_\mathfrak{m}} \delta q_\mathfrak{m})dt -\int (\frac{d}{dt}\frac{dl}{d\dot{q}_\mathfrak{m}} \delta {q}_\mathfrak{m})dt \\
+     &=\int (\frac{dl}{dq_\mathfrak{m}} -\frac{d}{dt}\frac{dl}{d\dot{q}_\mathfrak{m}} )\delta {q}_\mathfrak{m}dt ,
+     \end{split}
+     \label{lpart1}
+\end{align}
+\begin{equation}
+    (II) = \int  \frac{d l}{d\Omega} (\underbrace{(\dot{\eta}\pm ad_{{}^0V^I_0} \eta)}_{(A)} + \underbrace{\A\delta \dot{q}_\mathfrak{m}+\delta \A\dot{q}_\mathfrak{m}}_{(B)})dt
+    \label{lpart2}
+\end{equation}
+where the variation of total Jacobian matrix $\delta \A$ is formulated in \eqref{jspderiv}.
+%Since work is the time-integration of force times velocity or moment times angular velocity one can observe that forces and moments belong to the dual space of the velocities and angular velocities, respectively.
+%which is equivalent to solving the Euler-Lagrange equations for a fully parametrized system.
+Noticing from \ref{etadefinition} that $\delta g^I_0=(g^I_0)^{-1}\eta$, we rewrite the remaining terms in \ref{variationequation}:
+\begin{equation}
+    (III)=\frac{dU}{dg^I_0} (g^I_0)^{-1}\eta+\frac{dU}{dq_\m} \delta q_m
+\end{equation}
+\begin{equation}
+    (IV)= F_0 (g^I_0)^{-1}\eta+ F_\m \delta q_\m
+\end{equation}
 By introducing the generalized momentum
 \begin{equation}
-    P=\frac{\partial l}{\partial \Omega}=M_0 \Omega + M_0 J_{sp}\dot{q}_\mathfrak{m},
+    P=\frac{\partial l}{\partial \Omega}=M_0 \Omega + M_0 \A\dot{q}_\mathfrak{m},
 \end{equation}
 %the decoupled equations of motion can be calculated based on Equations \ref{lpart1} and \ref{lpart2}:
 %\begin{equation}
 %    -\dot{P}+ad^*_{^0V^I_0}P=F_{\Omega}
-%    \label{euler-poincare_eq}
+%    \label{euler-poincar\'{e}_eq}
 %\end{equation}
 %\begin{equation}
-%    \hat{M}_{m}\ddot{q}_\mathfrak{m}+\dot{q}_\mathfrak{m}^T\hat{C}_{m}\dot{q}_\mathfrak{m}+\hat{N}_{m}=F_\mathfrak{m}-F_{\Omega}J_{sp}
+%    \hat{M}_{m}\ddot{q}_\mathfrak{m}+\dot{q}_\mathfrak{m}^T\hat{C}_{m}\dot{q}_\mathfrak{m}+\hat{N}_{m}=F_\mathfrak{m}-F_{\Omega}\A
 %\end{equation}
 the terms $(A)$ and $(B)$ in \eqref{lpart2} are rewritten:
 \begin{align}
@@ -818,32 +1413,35 @@ the terms $(A)$ and $(B)$ in \eqref{lpart2} are rewritten:
     (A) &= \int (<P,\dot{\eta}>+ <P,ad_{V^o_b}\eta>)dt\\
         &= \int (-\dot{P}\eta+<ad^*_{^0V^I_0}P,\eta>)dt\\
         &= \int (-\dot{P}+ad_{{}^0V^I_0}P)\eta dt\\
-    (B) &= \int P(J_{sp}\delta \dot{q}_\mathfrak{m}+\delta J_{sp}\dot{q}_\mathfrak{m})dt\\
-        &= \int (-\dot{P}J_{sp}\delta q_\mathfrak{m}-P\frac{\partial J_{sp}}{\partial q_\mathfrak{m}}\dot{q}_\mathfrak{m}\delta q_\mathfrak{m}+P\frac{\partial J_{sp}}{\partial q_\mathfrak{m}}\delta q_\mathfrak{m} \dot{q}_\mathfrak{m})dt
+    (B) &= \int P(\A\delta \dot{q}_\mathfrak{m}+\delta \A\dot{q}_\mathfrak{m})dt\\
+        &= \int (-\dot{P}\A\delta q_\mathfrak{m}-P\frac{\partial \A}{\partial q_\mathfrak{m}}\dot{q}_\mathfrak{m}\delta q_\mathfrak{m}+P\frac{\partial \A}{\partial q_\mathfrak{m}}\delta q_\mathfrak{m} \dot{q}_\mathfrak{m})dt
         \label{AandB}
 \end{split}
 \end{align}
-Noticing the arbitrariness of variation $\eta$ which only appears in terms $(A)$ and $(IV)$ in the variational principle \eqref{variationequation}, they can be collected to provide the Euler-Poincare formula for the dynamics of the base vehicle
-\begin{align}
-    -\dot{P}+ad^*_{^0V^I_0}P=F_{\Omega}
-    \label{euler-poincare_eq}
-\end{align}
+Noticing the arbitrariness of variation $\eta$ which only appears in terms $(A)$ and $(IV)$ in the variational principle \eqref{variationequation}, they can be collected to provide the Euler-poincar\'{e} formula for the dynamics of the base vehicle in \eqref{euler-poincare_eq},
+where 
+\begin{equation}
+    F_{cg}=(F_0+\frac{dU}{dg^I_0})(g^I_0)^{-1}.
+\end{equation} 
 Collecting the terms in $(I)$ and $(B)$ from Equations \ref{lpart1} and \ref{AandB} and the term $(III)$ from \eqref{variationequation}, and noticing the arbitrariness of the variation $\delta q_\mathfrak{m}$ results in the internal dynamics equation:
 \begin{equation}
-    {\hat{M}_{m}\ddot{q}_\mathfrak{m}+\hat{C}_{m}\dot{q}_\mathfrak{m}+\hat{N}_{m}=F_\mathfrak{m}-F_{\Omega}J_{sp},}
+    {\hat{M}_{m}\ddot{q}_\mathfrak{m}+\hat{C}_{m}\dot{q}_\mathfrak{m}+\hat{N}_{m}=F_\mathfrak{m}+\frac{dU}{dq_\m}-F_{cg}\A,}
 \end{equation}
 where
 \begin{equation}
-    \hat{M}_\mathfrak{m}=M_\mathfrak{m}-J_{sp}^TM_0J_{sp},
+    \hat{M}_\mathfrak{m}=M_\mathfrak{m}-\A^TM_0\A,
 \end{equation}
 \begin{equation}
     {(\hat{C}_{m})=\bigg(\sum\frac{\partial \hat{M}_\mathfrak{m}}{\partial{q}_i}\dot{q}_i-\frac{1}{2}\begin{bmatrix}\dot{q}_\mathfrak{m}^T\frac{\partial \hat{M}_\mathfrak{m}}{\partial q_1}\\\dot{q}_\mathfrak{m}^T\frac{\partial \hat{M}_\mathfrak{m}}{\partial q_2}\\ \vdots\\\dot{q}_\mathfrak{m}^T\frac{\partial \hat{M}_\mathfrak{m}}{\partial q_n}\\\end{bmatrix}\bigg)}
 \end{equation}
 \begin{multline}
-    <\hat{N},\delta q_\mathfrak{m}>=<P,[J_{sp}\dot{q}_\mathfrak{m},J_{sp}\delta q_\mathfrak{m}]-\frac{\partial J_{sp}}{\partial q_\mathfrak{m}}\dot{q}_\mathfrak{m}\delta q\\
-    +\frac{\partial J_{sp}}{\partial q_\mathfrak{m}}\delta q_\mathfrak{m} \dot{q}_\mathfrak{m}-[\Omega,J_{sp}\delta q_\mathfrak{m}]>,
+    <\hat{N},\delta q_\mathfrak{m}>=<P,[\A\dot{q}_\mathfrak{m},\A\delta q_\mathfrak{m}]-\frac{\partial \A}{\partial q_\mathfrak{m}}\dot{q}_\mathfrak{m}\delta q\\
+    +\frac{\partial \A}{\partial q_\mathfrak{m}}\delta q_\mathfrak{m} \dot{q}_\mathfrak{m}-[\Omega,\A\delta q_\mathfrak{m}]>,
 \end{multline}
 \end{proof}
+
+
+\subsection{Evaluation of Forward Dynamics Parameters}
 For the calculation of these three terms:
 \begin{itemize}
     \item First, the following chain rule can be utilized in \eqref{lpart1}, equivalent to an Euler-Lagrange equation:
@@ -862,35 +1460,35 @@ to find the coriolis term $\hat{C}_\mathfrak{m}$. Here, we have used
 \item The $\hat{N}_\mathfrak{m}$ term is derived by substituting $\dot{P}$ into $(B)$:
 \begin{align}
 \begin{split}
-    (B) = \int (-(ad_{^0V^I_0}^*P-F_{\Omega})J_{sp}\delta q_\mathfrak{m}&-P\frac{\partial J_{sp}}{\partial q_\mathfrak{m}}\dot{q}_\mathfrak{m}\delta q\\
-    &+P\frac{\partial J_{sp}}{\partial q_\mathfrak{m}}\delta q_\mathfrak{m} \dot{q}_\mathfrak{m})dt\\
-    = \int ((F_{\Omega}J_{sp}-<ad_{{}^0V^I_0}P,J_{sp}&>)\delta q_\mathfrak{m}\\-P\frac{\partial J_{sp}}{\partial q_\mathfrak{m}}\dot{q}_\mathfrak{m}\delta q
-    &+P\frac{\partial J_{sp}}{\partial q_\mathfrak{m}}\delta q_\mathfrak{m} \dot{q}_\mathfrak{m})dt\\
-    = \int (F_{\Omega}J_{sp}\delta q_\mathfrak{m}-P[{}^0V^I_0,J_{sp}]&\delta q_\mathfrak{m}-P\frac{\partial J_{sp}}{\partial q_\mathfrak{m}}\dot{q}_\mathfrak{m}\delta q\\
-    &+P\frac{\partial J_{sp}}{\partial q_\mathfrak{m}}\delta q_\mathfrak{m} \dot{q}_\mathfrak{m})dt
+    (B) = \int (-(ad_{^0V^I_0}^*P-F_{\Omega})\A\delta q_\mathfrak{m}&-P\frac{\partial \A}{\partial q_\mathfrak{m}}\dot{q}_\mathfrak{m}\delta q\\
+    &+P\frac{\partial \A}{\partial q_\mathfrak{m}}\delta q_\mathfrak{m} \dot{q}_\mathfrak{m})dt\\
+    = \int ((F_{\Omega}\A-<ad_{{}^0V^I_0}P,\A&>)\delta q_\mathfrak{m}\\-P\frac{\partial \A}{\partial q_\mathfrak{m}}\dot{q}_\mathfrak{m}\delta q
+    &+P\frac{\partial \A}{\partial q_\mathfrak{m}}\delta q_\mathfrak{m} \dot{q}_\mathfrak{m})dt\\
+    = \int (F_{\Omega}\A\delta q_\mathfrak{m}-P[{}^0V^I_0,\A]&\delta q_\mathfrak{m}-P\frac{\partial \A}{\partial q_\mathfrak{m}}\dot{q}_\mathfrak{m}\delta q\\
+    &+P\frac{\partial \A}{\partial q_\mathfrak{m}}\delta q_\mathfrak{m} \dot{q}_\mathfrak{m})dt
 \end{split}
 \end{align}
 the term $(B)$ can be rewritten using Lemma \ref{lemmabracket} as
 \begin{multline}
-    (B)= \int F_{\Omega}J_{sp}\delta q_\mathfrak{m} + P([J_{sp}\dot{q}_\mathfrak{m},J_{sp}\delta q_\mathfrak{m}]\\
-    -\frac{\partial J_{sp}}{\partial q_\mathfrak{m}}\dot{q}_\mathfrak{m}\delta q_\mathfrak{m}
-    +\frac{\partial J_{sp}}{\partial q_\mathfrak{m}}\delta q_\mathfrak{m} \dot{q}_\mathfrak{m}-[\Omega,J_{sp}\delta q_\mathfrak{m}])dt
+    (B)= \int F_{\Omega}\A\delta q_\mathfrak{m} + P([\A\dot{q}_\mathfrak{m},\A\delta q_\mathfrak{m}]\\
+    -\frac{\partial \A}{\partial q_\mathfrak{m}}\dot{q}_\mathfrak{m}\delta q_\mathfrak{m}
+    +\frac{\partial \A}{\partial q_\mathfrak{m}}\delta q_\mathfrak{m} \dot{q}_\mathfrak{m}-[\Omega,\A\delta q_\mathfrak{m}])dt
     \label{finalB}
 \end{multline}
 \begin{lemma}\label{lemmabracket}
 The following Lie bracket relates to the mechanical connection through
 \begin{equation}
-    [{}^0V^I_0,.]=[\Omega,.]-[J_{sp}\dot{q}_\mathfrak{m},.]
+    [{}^0V^I_0,.]=[\Omega,.]-[\A\dot{q}_\mathfrak{m},.]
 \end{equation}
 \end{lemma}
 \begin{proof}[Proof]
 Using the definition of $\Omega$ from \eqref{omega}:
 \begin{align}
     \begin{split}
-    {}^0V^I_0 &=\Omega-J_{sp}\dot{q}_\mathfrak{m}\\
-        \Rightarrow [{}^0V^I_0,.] &=(\Omega-J_{sp}\dot{q}_\mathfrak{m})(.)-(.)(\Omega-J_{sp}\dot{q}_\mathfrak{m})\\
-        &=\Omega(.)-(.)\Omega-J_{sp}\dot{q}_\mathfrak{m}(.)+(.)J_{sp}\dot{q}_\mathfrak{m}\\
-        &=[\Omega,.]-[J_{sp}\dot{q}_\mathfrak{m},.]
+    {}^0V^I_0 &=\Omega-\A\dot{q}_\mathfrak{m}\\
+        \Rightarrow [{}^0V^I_0,.] &=(\Omega-\A\dot{q}_\mathfrak{m})(.)-(.)(\Omega-\A\dot{q}_\mathfrak{m})\\
+        &=\Omega(.)-(.)\Omega-\A\dot{q}_\mathfrak{m}(.)+(.)\A\dot{q}_\mathfrak{m}\\
+        &=[\Omega,.]-[\A\dot{q}_\mathfrak{m},.]
     \end{split}
 \end{align}
 \end{proof}
@@ -899,15 +1497,12 @@ Using the definition of $\Omega$ from \eqref{omega}:
 
 %so we can know
 %\begin{equation}
-  %  \mathcolorbox{yellow}{\hat{C}_\mathfrak{m}=\sum(\frac{\partial M_\mathfrak{m}}{\partial{q}_i}-\frac{\partial (J_{sp}^TM_bJ_{sp})}{\partial{q}_i})??}
+  %  \mathcolorbox{yellow}{\hat{C}_\mathfrak{m}=\sum(\frac{\partial M_\mathfrak{m}}{\partial{q}_i}-\frac{\partial (\A^TM_b\A)}{\partial{q}_i})??}
 %\end{equation}
 
-
-
-\subsection{Evaluation of Forward Dynamics Parameters}
 In order to find $\hat{C}_\mathfrak{m}$, we need to find the partial derivative of the arm mass matrix from \eqref{totalM} to each of the generalized coordinates of the joints
 \begin{equation}
-    \frac{\partial\hat{M}_{\mathfrak{m}}}{\partial q_i}=\frac{\partial{M}_{\mathfrak{m}}}{\partial q_i}-\frac{\partial{(J_{sp}^TM_0J_{sp})}}{\partial q_i},
+    \frac{\partial\hat{M}_{\mathfrak{m}}}{\partial q_i}=\frac{\partial{M}_{\mathfrak{m}}}{\partial q_i}-\frac{\partial{(\A^TM_0\A)}}{\partial q_i},
 \end{equation}
 %\begin{equation}
  %   {\frac{d}{dt}({M}_\mathfrak{m})}=\sum\frac{\partial {M}_\mathfrak{m}}{\partial{q}_i}\dot{q}_i
@@ -915,33 +1510,27 @@ In order to find $\hat{C}_\mathfrak{m}$, we need to find the partial derivative 
 \begin{equation}
  \frac{\partial M_\mathfrak{m}}{\partial q_i}
 =
-\frac{\partial\mathcal{J}_\mathfrak{m}^T}{\partial q_i} (diag\{M'_i\})\mathcal{J}_\mathfrak{m}+\mathcal{J}_\mathfrak{m}^T(diag\{M'_i\})\frac{\partial \mathcal{J}_\mathfrak{m}}{\partial q_i} %\quad  i=1,\cdots,n
+\frac{\partial{\mathcal{J}}_\mathfrak{m}^T}{\partial q_i} (diag\{M'_i\}){\mathcal{J}}_\mathfrak{m}+{\mathcal{J}}_\mathfrak{m}^T(diag\{M'_i\})\frac{\partial {\mathcal{J}}_\mathfrak{m}}{\partial q_i} %\quad  i=1,\cdots,n
 \end{equation}
 \begin{equation}
-    \frac{\partial (J_{sp}^TM_0J_{sp})}{\partial q_i}={\frac{\partial}{\partial q_i}(J_{sp}^T})M_0J_{sp}+ J_{sp}^TM_0{\frac{\partial}{\partial q_i}(J_{sp}})
+    \frac{\partial (\A^TM_0\A)}{\partial q_i}={\frac{\partial}{\partial q_i}(\A^T})M_0\A+ \A^TM_0{\frac{\partial}{\partial q_i}(\A})
 \end{equation}
 %\begin{equation}
-%    {\frac{d}{dt}J_{sp}}=\sum\frac{\partial J_{sp}}{\partial{q}_i}{}\dot{q}_i
+%    {\frac{d}{dt}\A}=\sum\frac{\partial \A}{\partial{q}_i}{}\dot{q}_i
 %\end{equation}
-where we used
-\begin{equation}
-    M_\mathfrak{m}=\mathcal{J}_\mathfrak{m}^T(diag\{{M}'_i\})\mathcal{J}_\mathfrak{m}
-\end{equation}
-\begin{equation}
-    \mathcal{J}_\mathfrak{m}=\begin{bmatrix}L_{m0}&L_\mathfrak{m}\end{bmatrix}\Xi_\mathfrak{m}
-\end{equation}
-and $L_\mathfrak{m}$ and $L_{m0}$ come from
-\begin{equation}
-    L=\begin{bmatrix}L_0&L_{0m}\\
-    L_{m0}&L_\mathfrak{m}\end{bmatrix}
-\end{equation}
-via
-\begin{equation}
-    L_\mathfrak{m}=\begin{bmatrix} I_{6\times6}&0_6&\cdots&0_6\\ \Add^2_2 &I_{6\times6}&\cdots&0_6\\ \vdots &\vdots & \vdots &\vdots & \vdots\\ \Add^2_n &\Add^3_n&\cdots&I_{6\times6} \end{bmatrix}
-\end{equation}
-\begin{equation}
-    L_{m0}=\begin{bmatrix} \Add_1^1\\ \Add^1_2 \\ \vdots \\ \Add^1_n \end{bmatrix}
-\end{equation}
+%where we used
+%\begin{equation}
+%    M_\mathfrak{m}=\mathcal{J}_\mathfrak{m}^T(diag\{{M}'_i\})\mathcal{J}_\mathfrak{m}
+%\end{equation}
+%\begin{equation}
+%    \mathcal{J}_\mathfrak{m}=\begin{bmatrix}L_{m0}&L_\mathfrak{m}\end{bmatrix}\Xi_\mathfrak{m}
+%\end{equation}
+%and $L_\mathfrak{m}$ and $L_{m0}$ come from \eqref{lbreakdown}.
+\begin{lemma}
+
+\end{lemma}
+\begin{proof}[Proof:]
+
 Since the twists in the $\mathcal{J}$ matrix are defined in the initial configuration and do not depend on the current configuration, and the elements of the diagonal mass matrix also only depend on geometry and properties of each body and not the configuration, the only matrix affected by the differentiation is $L$ which includes the Adjoints. The $jk^{th}$ term $L_{jk}=\Add_j^k$
  can be differentiated with respect to $q_i$ via
 \begin{equation}
@@ -980,8 +1569,8 @@ or
 %\[C=\sum\frac{\partial M}{\partial{q}_i}\dot{q}_i-\frac{1}{2}\begin{bmatrix}\dot{q}^T\frac{\partial M}{\partial q_b}\\\dot{q}^T\frac{\partial M}{\partial q_1}\\ \vdots\\\dot{q}^T\frac{\partial M}{\partial q_n}\\\end{bmatrix}\]
 and for the coupling term
 \begin{multline}
-    {\frac{d}{dt}(J_{sp}^TM_bJ_{sp})}=(\sum\frac{\partial J_{sp}}{\partial{q}_i}^T{}\dot{q}_i)M_bJ_{sp}\\
-    +J_{sp}^T(\sum\frac{\partial M_b}{\partial{q}_i}\dot{q}_i)J_{sp}+ J_{sp}^TM_b(\sum\frac{\partial J_{sp}}{\partial{q}_i}\dot{q}_i)
+    {\frac{d}{dt}(\A^TM_b\A)}=(\sum\frac{\partial \A}{\partial{q}_i}^T{}\dot{q}_i)M_b\A\\
+    +\A^T(\sum\frac{\partial M_b}{\partial{q}_i}\dot{q}_i)\A+ \A^TM_b(\sum\frac{\partial \A}{\partial{q}_i}\dot{q}_i)
 \end{multline}
 we can write
 \begin{equation}
@@ -1008,11 +1597,11 @@ or
 \end{equation}
 and we  can write
 \begin{equation}
- \frac{\partial J_{sp}}{\partial q_i}
+ \frac{\partial \A}{\partial q_i}
 =\frac{\partial M_0}{\partial q_i}^{-1}M_{0m}+(M_0)^{-1}\frac{\partial M_{0m}}{\partial q_i}
 \label{jspderiv}
 \end{equation}
-where we used \eqref{jacobianspecial}. Now to the dual lie co-algebra term
+where we used \eqref{Jacobianspecial}. Now to the dual lie co-algebra term
 \begin{equation}
     <ad^{*}_{\xi_i}({\hat{M}_{m}}{}\dot{q}_\mathfrak{m}),\delta q>=<{\hat{M}_{m}}{}\dot{q}_\mathfrak{m},ad_{\xi_i}(\delta q)>
 \end{equation}
@@ -1020,31 +1609,79 @@ where we used \eqref{jacobianspecial}. Now to the dual lie co-algebra term
     =<{\hat{M}_{m}}{}\dot{q}_\mathfrak{m},[\delta q, \xi_i]>
 \end{equation}
 
+\end{proof}
+
+\subsection{Hamilton-poincar\'{e} Dynamics of Vehicle-Manipulator Systems}
 
 
+\subsection{Hamilton-poincar\'{e} Dynamics of Vehicle-Manipulators}
+Hamiltonian of a multi-body system is another measure of energy, similarly defined as
+\begin{equation}
+    \mathcal{H}=\frac{1}{2}\begin{bmatrix}^0\V^I_0 \\ \dot{q}_\mathfrak{m}\end{bmatrix}^T M(q_\mathfrak{m}) \begin{bmatrix}^0\V^I_0\\\dot{q}_\mathfrak{m}\end{bmatrix}+U(g^I_0,q_\m)
+\end{equation}
+
+By defining the conjugate variables ${p_\m}_i$ to ${q_\m}_i$ and the reduced Hamiltonian as
+\begin{equation}
+    h(q_\m,p_\m,P)=<p_\m,\dot{q}_\m>+<P,\Omega>-l(q_\m,\dot{q}_\m,\Omega),
+\end{equation}
+the dynamics of the vehicle-manipulator can be rewritten in the form of \textbf{\textit{Hamilton-poincar\'{e} equations}} in coordinates:
+\begin{align}
+    \begin{split}
+    &\frac{d}{dt}{q_\m}_i=\frac{\partial h}{\partial{\dot{p}_\m}_i}\\
+    &\frac{d}{dt}{p_\m}_i=-\frac{\partial h}{\partial {q_\m}_i}+P()
+    \end{split}
+\end{align}
 
 
+ in order to demonstrate the computational and intuitive advantages of the proposed Lagrange-poincar\'{e} formulation of vehicle-manipulators
 
-%---------------------------------------------- non-inertial frame
+\appendix
+\label{app:connection}
 
-\section{Case Study: Planar Vehicle}
+\chapter{Coordinate Transformation via Adjoints}\label{appendix:adjoints}
+\begin{strip}
 
-\begin{figure}
-    \centering
-    \includegraphics[width=0.4\textwidth]{vehicle-manipulator.jpg}
-    \caption{Sample 2-link manipulator mounted on a Planar-joint base}
-    \label{fig:planar}
-\end{figure}
+\begin{equation*}
+    \Ad_{g^I_0}=\begin{bmatrix}R_0^I & \begin{bmatrix}
+    0 & -z & y\\z & 0 & -x\\-y & x & 0\end{bmatrix} R_0^ I \\0& R_0^I\end{bmatrix}
+\end{equation*}
+\begin{equation*}
+    \Ad_{e^{\hat{\xi}_1q_1}}=\begin{bmatrix}1 & 0 & 0 & 0 & l_0(1-\cos q_1) & l_0 \sin q_1\\0 &\cos q_1 & -\sin q_1 & l_0(1-\cos q_1) & 0 & 0 \\0 & \sin q_1  & \cos q_1 & l_0\sin q_1 &0 & 0\\ 0 & 0 & 0& 
+    1 & 0 & 0 \\0 & 0 & 0& 0 &\cos q_1 & -\sin q_1 \\0 & 0 & 0& 0 & \sin q_1  & \cos q_1
+    \end{bmatrix}
+\end{equation*}
 
-\section{Case Study: Spacecraft-Manipulator}
+\begin{equation*}
+    \Ad_{e^{\hat{\xi}_2q_2}}=\begin{bmatrix}\cos q_2 & 0 & \sin q_2 & 0 & (l_0+l_1)(\cos q_2-1) & 0\\0 &1 & 0 & (l_0+l_1)(\cos q_2-1) & 0 & (l_0+l_1)\sin q_2 \\ -\sin q_2 & 0  & \cos q_2 & 0 &-(l_0+l_1)\sin q_2 & 0\\ 0 & 0 & 0& 
+    \cos q_2 & 0 & \sin q_2 \\0 & 0 & 0& 0 & 1 & 0 \\0 & 0 & 0& -\sin q_2 & 0 & \cos q_2
+    \end{bmatrix}
+\end{equation*}
 
-\begin{figure}
-    \centering
-    \includegraphics[width=0.2\textwidth]{Untitled Diagram(2).jpg}
-    \caption{Sample 2-link manipulator mounted on a free-floating spacecraft base}
-    \label{fig:my_label}
-\end{figure}
+\begin{equation*}
+    \Ad_{e^{-\hat{\xi}_1q_1}}=\begin{bmatrix}1 & 0 & 0 & 0 & l_0(1-\cos q_1) & -l_0 \sin q_1\\0 &\cos q_1 & \sin q_1 & l_0(1-\cos q_1) & 0 & 0 \\0 & -\sin q_1  & \cos q_1 & l_0\sin q_1 &0 & 0\\ 0 & 0 & 0& 
+    1 & 0 & 0 \\0 & 0 & 0& 0 &\cos q_1 & \sin q_1 \\0 & 0 & 0& 0 & -\sin q_1  & \cos q_1
+    \end{bmatrix}
+\end{equation*}
 
+\begin{equation*}
+    \Ad_{e^{-\hat{\xi}_2q_2}}=\begin{bmatrix}\cos q_2 & 0 & -\sin q_2 & 0 & (l_0+l_1)(1-\cos q_2) & 0\\0 &1 & 0 & (l_0+l_1)(1-\cos q_2) & 0 & -(l_0+l_1)\sin q_2 \\ \sin q_2 & 0  & \cos q_2 & 0 &-(l_0+l_1)\sin q_2 & 0\\ 0 & 0 & 0& 
+    \cos q_2 & 0 & -\sin q_2 \\0 & 0 & 0& 0 & 1 & 0 \\0 & 0 & 0& \sin q_2 & 0 & \cos q_2
+    \end{bmatrix}
+\end{equation*}
+
+\begin{equation*}
+    \Ad_{\bar{g}^0_1}=\begin{bmatrix}
+    \mathbb{I}_{3\times 3} &\begin{bmatrix}
+    0 &-l_0& 0\\l_0& 0& 0\\0 & 0 & 0\end{bmatrix}\\ \mathbb{O}_{3\times 3} & \mathbb{I}_{3\times 3}
+    \end{bmatrix}
+\quad \& \quad
+    \Ad_{\bar{g}^0_2}=\begin{bmatrix}
+    \mathbb{I}_{3\times 3} &\begin{bmatrix}
+    0 &-l_0-l_1& 0\\l_0+l_1& 0& 0\\0 & 0 & 0\end{bmatrix}\\ \mathbb{O}_{3\times 3} & \mathbb{I}_{3\times 3}
+    \end{bmatrix}
+\end{equation*}
+
+\end{strip}
 
 \begin{comment}
 
